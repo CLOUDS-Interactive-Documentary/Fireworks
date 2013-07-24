@@ -1,7 +1,7 @@
 //
-//  emptyVisualSystem.h
+//  CloudsVisualSystemFireworks.h
 //
-//  Created by Patricio Gonzalez Vivo on 7/23/13.
+//  Created by Lars Berg
 //
 //
 

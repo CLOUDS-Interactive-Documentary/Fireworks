@@ -1,7 +1,7 @@
 //
 //  CloudsVisualSystemFireworks.cpp
 //
-//  Created by Patricio Gonzalez Vivo on 7/23/13.
+//  Created by Lars Berhg
 //
 //
 
@@ -25,7 +25,7 @@ void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath)
 void CloudsVisualSystemFireworks::selfBegin()
 {
 	//shader
-	shader.load("shaders/base.vert", "shaders/base.frag");
+	shader.load(getVisualSystemDataPath() + "shaders/base.vert", getVisualSystemDataPath() + "shaders/base.frag");
 	
 	shader.begin();
 	shader.setUniform3f( "gravity", 0, -98, 0 );
@@ -33,7 +33,7 @@ void CloudsVisualSystemFireworks::selfBegin()
 	startColor.set( .9, .95, 1.95, 1 );
 	endColor.set( .6, 1.3, .2, 1 );
 	
-	spriteImage.loadImage("images/sphereNormal.png");
+	spriteImage.loadImage(getVisualSystemDataPath() + "images/sphereNormal.png");
 	
 	
 	

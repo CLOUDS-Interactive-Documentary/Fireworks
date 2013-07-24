@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Fireworks.h"
+#include "CloudsVisualSystemFireworks.h"
 
 class testApp : public ofBaseApp{
   public:
