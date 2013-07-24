@@ -9,7 +9,7 @@
 
 string CloudsVisualSystemFireworks::getSystemName()
 {
-	return "CloudsVisualSystemFireworks";
+	return "Fireworks";
 }
 
 void CloudsVisualSystemFireworks::selfSetup()
