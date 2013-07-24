@@ -5,11 +5,11 @@
 //
 //
 
-#include "Fireworks.h"
+#include "CloudsVisualSystemFireworks.h"
 
 string CloudsVisualSystemFireworks::getSystemName()
 {
-	return "Fireworks";
+	return "CloudsVisualSystemFireworks";
 }
 
 void CloudsVisualSystemFireworks::selfSetup()
