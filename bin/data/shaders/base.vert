@@ -1,5 +1,5 @@
 #version 120
-
+uniform sampler2DRect map;
 uniform vec4 startColor;
 uniform vec4 endColor;
 
@@ -15,6 +15,7 @@ varying vec3 ecPosition3;
 varying vec3 eye;
 varying vec4 color;
 varying float age;
+varying vec2 uv;
 
 float PI = 3.14159265359;
 float HALF_PI = 1.57079632679;
@@ -49,4 +50,7 @@ void main(){
 	gl_PointSize = min( maxPointSize, size * attenuation * (1. - age) );
 	
 	color = mix( startColor, endColor, age );
+	
+	
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 }

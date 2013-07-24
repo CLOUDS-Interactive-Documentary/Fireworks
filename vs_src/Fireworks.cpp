@@ -33,6 +33,10 @@ void CloudsVisualSystemFireworks::selfBegin()
 	startColor.set( .9, .95, 1.95, 1 );
 	endColor.set( .6, 1.3, .2, 1 );
 	
+	spriteImage.loadImage("images/sphereNormal.png");
+	
+	
+	
 	//camera
 	camSpeed = 4;
 	
@@ -168,6 +172,7 @@ void CloudsVisualSystemFireworks::selfDraw()
 	shader.setUniform3f("cameraPosition", camPos.x, camPos.y, camPos.z );
 	shader.setUniform4f("startColor", startColor.x, startColor.y, startColor.z, startColor.w );
 	shader.setUniform4f("endColor", endColor.x, endColor.y, endColor.z, endColor.w );
+	shader.setUniformTexture("map", spriteImage, 0 );
 	
 	vbo.drawElements( GL_POINTS, indexCount-1 );
 	

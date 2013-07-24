@@ -92,6 +92,8 @@ public:
 	
 	float camSpeed;
 	
+	ofImage spriteImage;
+	
 
     
 protected:
