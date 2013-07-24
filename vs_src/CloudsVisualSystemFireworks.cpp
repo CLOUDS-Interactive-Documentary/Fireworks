@@ -80,7 +80,7 @@ void CloudsVisualSystemFireworks::selfBegin()
 	
 	indexCount = FIREWORKS_NUM_PARTICLES;
 	
-	nextFireworkExplosionTime = 1;
+	nextFireworkExplosionTime = ofGetElapsedTimef() + 1;
     
 }
 
