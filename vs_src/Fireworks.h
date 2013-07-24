@@ -37,6 +37,8 @@ public:
     void selfMouseMoved(ofMouseEventArgs& data);
     void selfMousePressed(ofMouseEventArgs& data);
     void selfMouseReleased(ofMouseEventArgs& data);
+	
+	void selfSetupTimeline();
     
     void selfSetupGui();
     void selfGuiEvent(ofxUIEventArgs &e);
@@ -48,6 +50,8 @@ public:
     void guiRenderEvent(ofxUIEventArgs &e);
 	
 	//END TEMPLATE
+	
+	ofCamera* getCameraRef();
 	
 	
 	void updateVbo();
@@ -79,6 +83,11 @@ public:
 	vector<float> spawnTime;
 	vector <float> startTimes;
 	float fireWorkExplosionTime;
+	
+	//render attributes
+	ofColor startColor, endColor;
+	
+	ofxUISuperCanvas* fireworksGui;
 	
 
     

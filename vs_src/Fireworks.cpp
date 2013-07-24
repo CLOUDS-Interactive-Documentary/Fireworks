@@ -17,7 +17,8 @@ void CloudsVisualSystemFireworks::selfSetup()
     
 }
 
-void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath){
+void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath)
+{
 	
 }
 
@@ -69,90 +70,6 @@ void CloudsVisualSystemFireworks::selfBegin()
 	vbo.setIndexData( &indices[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	
 	indexCount = FIREWORKS_NUM_PARTICLES;
-    
-}
-
-
-void CloudsVisualSystemFireworks::updateVbo(){
-	int total = FIREWORKS_NUM_PARTICLES;
-	vbo.updateVertexData( &positions[0], total );
-	vbo.updateNormalData( &velocities[0], total );
-	vbo.updateTexCoordData( &lifeData[0], total );
-	
-	vbo.updateIndexData( &indices[0], indexCount );
-	
-	bUpdateVbo = false;
-}
-
-void CloudsVisualSystemFireworks::trailPoint( ofVec3f point, ofVec3f vel, int count ){
-	for(int i=0; i<count; i++){
-		emitFromPoint( point, vel, ofRandom(1.5, 3), ofGetElapsedTimef() );
-	}
-}
-
-
-void CloudsVisualSystemFireworks::emitFromPoint( ofVec3f point, ofVec3f dir, float lifespan, float t ){
-	
-	
-	int i = nextIndex;
-	nextIndex ++;
-	if( nextIndex > FIREWORKS_NUM_PARTICLES ) nextIndex = 0;
-	
-	//TODO: pass in quat rather then dir
-	ofQuaternion rotQuat;
-	rotQuat.makeRotate( ofVec3f(0,1,0), dir);
-	
-	positions[i] = point;
-	velocities[i] = baseVelocities[i] * rotQuat;
-	lifeData[i].set( t, lifespan );
-	
-	
-	bUpdateVbo = true;
-	
-}
-
-void CloudsVisualSystemFireworks::explodeFireWork( ofVec3f origin, ofVec3f vel ){
-	fireWorkExplosionTime = ofGetElapsedTimef();
-	
-	float maxVel = 4;
-	for (int i=0; i<10; i++) {
-		spawnTime.push_back(fireWorkExplosionTime);
-		spawnPos.push_back( origin );
-		spawnVel.push_back( ofVec3f( ofRandom(-maxVel, maxVel), ofRandom(0, maxVel*2), ofRandom(-maxVel, maxVel) ) );
-	}
-	
-}
-
-void CloudsVisualSystemFireworks::selfEnd()
-{
-    
-}
-
-void CloudsVisualSystemFireworks::selfExit()
-{
-    delete[] positions;
-    delete[] velocities;
-    delete[] baseVelocities;
-    delete[] lifeData;
-    delete[] indices;
-}
-
-void CloudsVisualSystemFireworks::selfSetupSystemGui()
-{
-   
-}
-
-void CloudsVisualSystemFireworks::selfSetupRenderGui()
-{
-    
-}
-
-void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e)
-{
-    
-}
-
-void CloudsVisualSystemFireworks::selfKeyPressed(ofKeyEventArgs & args){
     
 }
 
@@ -253,7 +170,7 @@ void CloudsVisualSystemFireworks::selfDraw()
 	camera.end();
 	
 	ofPopStyle();
-
+	
 	//    mat->end();
     glDisable(GL_NORMALIZE);
     glDisable(GL_DEPTH_TEST);
@@ -261,16 +178,135 @@ void CloudsVisualSystemFireworks::selfDraw()
 }
 
 
+void CloudsVisualSystemFireworks::updateVbo()
+{
+	int total = FIREWORKS_NUM_PARTICLES;
+	vbo.updateVertexData( &positions[0], total );
+	vbo.updateNormalData( &velocities[0], total );
+	vbo.updateTexCoordData( &lifeData[0], total );
+	
+	vbo.updateIndexData( &indices[0], indexCount );
+	
+	bUpdateVbo = false;
+}
+
+void CloudsVisualSystemFireworks::trailPoint( ofVec3f point, ofVec3f vel, int count )
+{
+	for(int i=0; i<count; i++){
+		emitFromPoint( point, vel, ofRandom(1.5, 3), ofGetElapsedTimef() );
+	}
+}
+
+void CloudsVisualSystemFireworks::emitFromPoint( ofVec3f point, ofVec3f dir, float lifespan, float t )
+{
+	
+	
+	int i = nextIndex;
+	nextIndex ++;
+	if( nextIndex > FIREWORKS_NUM_PARTICLES ) nextIndex = 0;
+	
+	//TODO: pass in quat rather then dir
+	ofQuaternion rotQuat;
+	rotQuat.makeRotate( ofVec3f(0,1,0), dir);
+	
+	positions[i] = point;
+	velocities[i] = baseVelocities[i] * rotQuat;
+	lifeData[i].set( t, lifespan );
+	
+	
+	bUpdateVbo = true;
+	
+}
+
+void CloudsVisualSystemFireworks::explodeFireWork( ofVec3f origin, ofVec3f vel )
+{
+	fireWorkExplosionTime = ofGetElapsedTimef();
+	
+	float maxVel = 4;
+	for (int i=0; i<10; i++) {
+		spawnTime.push_back(fireWorkExplosionTime);
+		spawnPos.push_back( origin );
+		spawnVel.push_back( ofVec3f( ofRandom(-maxVel, maxVel), ofRandom(0, maxVel*2), ofRandom(-maxVel, maxVel) ) );
+	}
+	
+}
+
+void CloudsVisualSystemFireworks::selfEnd()
+{
+    
+}
+
+ofCamera* CloudsVisualSystemFireworks::getCameraRef()
+{
+	return &camera;
+}
+
+void CloudsVisualSystemFireworks::selfExit()
+{
+    delete[] positions;
+    delete[] velocities;
+    delete[] baseVelocities;
+    delete[] lifeData;
+    delete[] indices;
+}
+
+void CloudsVisualSystemFireworks::selfSetupSystemGui()
+{
+   
+}
+
+void CloudsVisualSystemFireworks::selfSetupRenderGui()
+{
+    
+}
+
+void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e)
+{
+    
+}
+
+void CloudsVisualSystemFireworks::selfKeyPressed(ofKeyEventArgs & args){
+    
+}
+
 void CloudsVisualSystemFireworks::selfSetupGuis()
 {
     
+	fireworksGui = new ofxUISuperCanvas("FIREWORKS", gui);
+    fireworksGui->copyCanvasStyle(gui);
+    fireworksGui->copyCanvasProperties(gui);
+	
+    fireworksGui->setName("FireworksSettings");
+    fireworksGui->setWidgetFontSize(OFX_UI_FONT_SMALL);
+	
+	
+//	vec3 startCol = vec3(.9,.95,1.95);
+//	vec3 endCol = vec3(.6,1.3,.2);
+	
+//	fireworksGui->addSlider("FIREWORKS SIZE X", 10, 1000, &oceanTileSizeX);
+//	fireworksGui->addSlider("FIREWORKS SIZE Y", 10, 1000, &oceanTileSizeY);
+//	fireworksGui->addSlider("WIND SPEED Y", 2, 1000, &windSpeed);
+//	
+//	fireworksGui->addButton("REGENERATE", &shouldRegenerateOcean);
+//	
+//	fireworksGui->addSlider("WAVE SPEED", 1, 10, &ocean.waveSpeed);
+//	fireworksGui->addSlider("WAVE SCALE", 0, 100.0, &ocean.waveScale);
+//	fireworksGui->addSlider("WAVE CHOPPINESS", 0, 20, &ocean.choppyScale);
+	
+	ofAddListener(fireworksGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
+	
+    guis.push_back(fireworksGui);
+    guimap[fireworksGui->getName()] = fireworksGui;
+}
+
+void CloudsVisualSystemFireworks::selfSetupTimeline(){
+	
 }
 
 void CloudsVisualSystemFireworks::selfAutoMode()
 {
     
 }
-
 
 void CloudsVisualSystemFireworks::selfDrawBackground()
 {
