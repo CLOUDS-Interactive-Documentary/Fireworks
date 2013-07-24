@@ -8,6 +8,7 @@
 #pragma once
 
 #include "CloudsVisualSystem.h"
+#define FIREWORKS_NUM_PARTICLES 100000
 
 class CloudsVisualSystemFireworks : public CloudsVisualSystem {
 public:
@@ -45,6 +46,41 @@ public:
     
     void selfSetupRenderGui();
     void guiRenderEvent(ofxUIEventArgs &e);
+	
+	//END TEMPLATE
+	
+	
+	void updateVbo();
+	void explodeFireWork( ofVec3f origin=ofVec3f(), ofVec3f vel=ofVec3f() );
+	void emitFromPoint( ofVec3f point, ofVec3f dir, float lifespan=ofRandom(1.,3.), float t=ofGetElapsedTimef() );
+	
+	void trailPoint( ofVec3f point, ofVec3f vel = ofVec3f(), int count = 10 );
+	
+	//camera
+	ofEasyCam camera;
+	ofShader shader;
+	ofVbo vbo;
+	ofVec3f camPos;
+	ofVec3f camTarget;
+	
+	//particles
+	ofVec3f* positions;
+	ofVec3f* velocities;
+	ofVec3f* baseVelocities;
+	ofVec2f* lifeData;
+	ofIndexType* indices;
+	int indexCount, nextIndex;
+	
+	bool bUpdateVbo;
+	
+	//firework explosion stuff
+	vector<ofVec3f> spawnPos;
+	vector<ofVec3f> spawnVel;
+	vector<float> spawnTime;
+	vector <float> startTimes;
+	float fireWorkExplosionTime;
+	
+
     
 protected:
     
