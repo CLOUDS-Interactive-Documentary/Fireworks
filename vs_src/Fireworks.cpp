@@ -24,15 +24,20 @@ void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath)
 
 void CloudsVisualSystemFireworks::selfBegin()
 {
-	
-//	cout << "SelfBigin: "<<endl<<endl;
-	
+	//shader
 	shader.load("shaders/base.vert", "shaders/base.frag");
 	
 	shader.begin();
 	shader.setUniform3f( "gravity", 0, -98, 0 );
 	shader.end();
+	startColor.set( .9, .95, 1.95, 1 );
+	endColor.set( .6, 1.3, .2, 1 );
 	
+	//camera
+	camSpeed = 4;
+	
+	
+	//particle rendering 
 	bUpdateVbo = true;
 	indexCount = 0;
 	nextIndex = 0;
@@ -82,8 +87,8 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	
 	ofVec3f cameraAim = (camTarget - camPos).normalize();
 	
-	camPos += cameraAim * 3;
-	camTarget += cameraAim * 3;
+	camPos += cameraAim * camSpeed;
+	camTarget += cameraAim * camSpeed;
 	
 	camera.setPosition( camPos );
 	camera.getTarget().setPosition( camTarget );
@@ -105,7 +110,7 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	
 	if(updateIndices){
 		vbo.updateIndexData( indices, indexCount );
-		cout << indexCount << endl;
+//		cout << indexCount << endl;
 	}
 	
 	
@@ -160,8 +165,9 @@ void CloudsVisualSystemFireworks::selfDraw()
 	
 	shader.begin();
 	shader.setUniform1f( "time", ofGetElapsedTimef() );
-	ofVec3f camPos = camera.getPosition();
 	shader.setUniform3f("cameraPosition", camPos.x, camPos.y, camPos.z );
+	shader.setUniform4f("startColor", startColor.x, startColor.y, startColor.z, startColor.w );
+	shader.setUniform4f("endColor", endColor.x, endColor.y, endColor.z, endColor.w );
 	
 	vbo.drawElements( GL_POINTS, indexCount-1 );
 	
@@ -272,31 +278,33 @@ void CloudsVisualSystemFireworks::selfKeyPressed(ofKeyEventArgs & args){
 void CloudsVisualSystemFireworks::selfSetupGuis()
 {
     
-	fireworksGui = new ofxUISuperCanvas("FIREWORKS", gui);
-    fireworksGui->copyCanvasStyle(gui);
-    fireworksGui->copyCanvasProperties(gui);
+	fireworksRenderGui = new ofxUISuperCanvas("FW - rendering", gui);
+    fireworksRenderGui->copyCanvasStyle(gui);
+    fireworksRenderGui->copyCanvasProperties(gui);
 	
-    fireworksGui->setName("FireworksSettings");
-    fireworksGui->setWidgetFontSize(OFX_UI_FONT_SMALL);
+    fireworksRenderGui->setWidgetFontSize(OFX_UI_FONT_SMALL);
+	fireworksRenderGui->addSlider("fwStartColor.r", 0, 1., &startColor.x );
+	fireworksRenderGui->addSlider("fwStartColor.g", 0, 1., &startColor.y );
+	fireworksRenderGui->addSlider("fwStartColor.b", 0, 1., &startColor.z );
+	fireworksRenderGui->addSlider("fwStartColor.a", 0, 1., &startColor.w );
+	fireworksRenderGui->addSlider("fwEndColor.r", 0, 1., &endColor.x );
+	fireworksRenderGui->addSlider("fwEndColor.g", 0, 1., &endColor.y );
+	fireworksRenderGui->addSlider("fwEndColor.b", 0, 1., &endColor.z );
+	fireworksRenderGui->addSlider("fwEndColor.a", 0, 1., &endColor.w );
+	
+	fireworksBehaviorGui = new ofxUISuperCanvas("FW - behavior", gui);
+	fireworksBehaviorGui->addSpacer( 100, 2);
+	
+    fireworksBehaviorGui->copyCanvasStyle(gui);
+    fireworksBehaviorGui->copyCanvasProperties(gui);
+	
+	fireworksRenderGui->addSlider("camera speed", 1, 10, &camSpeed );
 	
 	
-//	vec3 startCol = vec3(.9,.95,1.95);
-//	vec3 endCol = vec3(.6,1.3,.2);
+	ofAddListener(fireworksRenderGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
 	
-//	fireworksGui->addSlider("FIREWORKS SIZE X", 10, 1000, &oceanTileSizeX);
-//	fireworksGui->addSlider("FIREWORKS SIZE Y", 10, 1000, &oceanTileSizeY);
-//	fireworksGui->addSlider("WIND SPEED Y", 2, 1000, &windSpeed);
-//	
-//	fireworksGui->addButton("REGENERATE", &shouldRegenerateOcean);
-//	
-//	fireworksGui->addSlider("WAVE SPEED", 1, 10, &ocean.waveSpeed);
-//	fireworksGui->addSlider("WAVE SCALE", 0, 100.0, &ocean.waveScale);
-//	fireworksGui->addSlider("WAVE CHOPPINESS", 0, 20, &ocean.choppyScale);
-	
-	ofAddListener(fireworksGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
-	
-    guis.push_back(fireworksGui);
-    guimap[fireworksGui->getName()] = fireworksGui;
+    guis.push_back(fireworksRenderGui);
+    guimap[fireworksRenderGui->getName()] = fireworksRenderGui;
 }
 
 void CloudsVisualSystemFireworks::selfSetupTimeline(){

@@ -85,9 +85,12 @@ public:
 	float fireWorkExplosionTime;
 	
 	//render attributes
-	ofColor startColor, endColor;
+	ofVec4f startColor, endColor;
 	
-	ofxUISuperCanvas* fireworksGui;
+	ofxUISuperCanvas* fireworksRenderGui;
+	ofxUISuperCanvas* fireworksBehaviorGui;
+	
+	float camSpeed;
 	
 
     

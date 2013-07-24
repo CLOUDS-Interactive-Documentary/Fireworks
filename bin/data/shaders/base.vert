@@ -1,4 +1,8 @@
 #version 120
+
+uniform vec4 startColor;
+uniform vec4 endColor;
+
 uniform float maxPointSize = 15.;
 uniform float time = 0.;
 uniform float frameRate = .016;
@@ -9,7 +13,7 @@ uniform vec3 cameraPosition;
 
 varying vec3 ecPosition3;
 varying vec3 eye;
-varying vec3 color;
+varying vec4 color;
 varying float age;
 
 float PI = 3.14159265359;
@@ -44,7 +48,5 @@ void main(){
 	float attenuation = 500./distance(pos.xyz, cameraPosition);
 	gl_PointSize = min( maxPointSize, size * attenuation * (1. - age) );
 	
-	vec3 startCol = vec3(.9,.95,1.95);
-	vec3 endCol = vec3(.6,1.3,.2);
-	color = mix( startCol, endCol, age );
+	color = mix( startColor, endColor, age );
 }
