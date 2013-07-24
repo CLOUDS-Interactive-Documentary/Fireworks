@@ -94,6 +94,9 @@ public:
 	
 	ofImage spriteImage;
 	
+	float nextFireworkExplosionTime;
+	void explodeFireWorkAtRandomPoint();
+	
 
     
 protected:

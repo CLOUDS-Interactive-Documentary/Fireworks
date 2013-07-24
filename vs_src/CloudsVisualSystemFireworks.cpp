@@ -79,6 +79,8 @@ void CloudsVisualSystemFireworks::selfBegin()
 	vbo.setIndexData( &indices[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	
 	indexCount = FIREWORKS_NUM_PARTICLES;
+	
+	nextFireworkExplosionTime = 1;
     
 }
 
@@ -137,6 +139,12 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	
 	if(	bUpdateVbo ){
 		updateVbo();
+	}
+	
+	if( nextFireworkExplosionTime < t ){
+		nextFireworkExplosionTime += ofRandom( .1, 1);
+		
+		explodeFireWorkAtRandomPoint();
 	}
 	
 }
@@ -340,12 +348,16 @@ void CloudsVisualSystemFireworks::selfKeyReleased(ofKeyEventArgs & args)
 {
 	
  	if(args.key == ' '){
-		
-		ofVec3f offset( ofRandom(-1, 1), ofRandom(-.1,.1), ofRandom(0, 1));
-		offset.normalize();
-		offset *= 300;
-		explodeFireWork( camTarget + offset );
+		explodeFireWorkAtRandomPoint();
 	}
+}
+
+void CloudsVisualSystemFireworks::explodeFireWorkAtRandomPoint()
+{
+	ofVec3f offset( ofRandom(-1, 1), ofRandom(-.1,.1), ofRandom(0, 1));
+	offset.normalize();
+	offset *= 300;
+	explodeFireWork( camTarget + offset );
 }
 
 void CloudsVisualSystemFireworks::selfMouseDragged(ofMouseEventArgs& data)
