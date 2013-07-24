@@ -142,7 +142,7 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	}
 	
 	if( nextFireworkExplosionTime < t ){
-		nextFireworkExplosionTime += ofRandom( .1, 1);
+		nextFireworkExplosionTime = t + ofRandom( .1, 1);
 		
 		explodeFireWorkAtRandomPoint();
 	}
