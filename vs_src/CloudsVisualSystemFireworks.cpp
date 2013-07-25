@@ -291,33 +291,33 @@ void CloudsVisualSystemFireworks::selfKeyPressed(ofKeyEventArgs & args){
 void CloudsVisualSystemFireworks::selfSetupGuis()
 {
     
-	fireworksRenderGui = new ofxUISuperCanvas("FW - rendering", gui);
-    fireworksRenderGui->copyCanvasStyle(gui);
-    fireworksRenderGui->copyCanvasProperties(gui);
-	
-    fireworksRenderGui->setWidgetFontSize(OFX_UI_FONT_SMALL);
-	fireworksRenderGui->addSlider("fwStartColor.r", 0, 1., &startColor.x );
-	fireworksRenderGui->addSlider("fwStartColor.g", 0, 1., &startColor.y );
-	fireworksRenderGui->addSlider("fwStartColor.b", 0, 1., &startColor.z );
-	fireworksRenderGui->addSlider("fwStartColor.a", 0, 1., &startColor.w );
-	fireworksRenderGui->addSlider("fwEndColor.r", 0, 1., &endColor.x );
-	fireworksRenderGui->addSlider("fwEndColor.g", 0, 1., &endColor.y );
-	fireworksRenderGui->addSlider("fwEndColor.b", 0, 1., &endColor.z );
-	fireworksRenderGui->addSlider("fwEndColor.a", 0, 1., &endColor.w );
-	
-	fireworksBehaviorGui = new ofxUISuperCanvas("FW - behavior", gui);
-	fireworksBehaviorGui->addSpacer( 100, 2);
-	
-    fireworksBehaviorGui->copyCanvasStyle(gui);
-    fireworksBehaviorGui->copyCanvasProperties(gui);
-	
-	fireworksRenderGui->addSlider("camera speed", 1, 10, &camSpeed );
-	
-	
-	ofAddListener(fireworksRenderGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
-	
-    guis.push_back(fireworksRenderGui);
-    guimap[fireworksRenderGui->getName()] = fireworksRenderGui;
+//	fireworksRenderGui = new ofxUISuperCanvas("FW - rendering", gui);
+//    fireworksRenderGui->copyCanvasStyle(gui);
+//    fireworksRenderGui->copyCanvasProperties(gui);
+//	
+//    fireworksRenderGui->setWidgetFontSize(OFX_UI_FONT_SMALL);
+//	fireworksRenderGui->addSlider("fwStartColor.r", 0, 1., &startColor.x );
+//	fireworksRenderGui->addSlider("fwStartColor.g", 0, 1., &startColor.y );
+//	fireworksRenderGui->addSlider("fwStartColor.b", 0, 1., &startColor.z );
+//	fireworksRenderGui->addSlider("fwStartColor.a", 0, 1., &startColor.w );
+//	fireworksRenderGui->addSlider("fwEndColor.r", 0, 1., &endColor.x );
+//	fireworksRenderGui->addSlider("fwEndColor.g", 0, 1., &endColor.y );
+//	fireworksRenderGui->addSlider("fwEndColor.b", 0, 1., &endColor.z );
+//	fireworksRenderGui->addSlider("fwEndColor.a", 0, 1., &endColor.w );
+//	
+//	fireworksBehaviorGui = new ofxUISuperCanvas("FW - behavior", gui);
+//	fireworksBehaviorGui->addSpacer( 100, 2);
+//	
+//    fireworksBehaviorGui->copyCanvasStyle(gui);
+//    fireworksBehaviorGui->copyCanvasProperties(gui);
+//	
+//	fireworksRenderGui->addSlider("camera speed", 1, 10, &camSpeed );
+//	
+//	
+//	ofAddListener(fireworksRenderGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
+//	
+//    guis.push_back(fireworksRenderGui);
+//    guimap[fireworksRenderGui->getName()] = fireworksRenderGui;
 }
 
 void CloudsVisualSystemFireworks::selfSetupTimeline(){
