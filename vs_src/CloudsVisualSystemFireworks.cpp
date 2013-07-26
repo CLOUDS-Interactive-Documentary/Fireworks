@@ -14,38 +14,6 @@ string CloudsVisualSystemFireworks::getSystemName()
 
 void CloudsVisualSystemFireworks::selfSetup()
 {
-    
-}
-
-void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath)
-{
-	
-}
-
-void CloudsVisualSystemFireworks::selfBegin()
-{
-	//shader
-	shader.load(getVisualSystemDataPath() + "shaders/base.vert", getVisualSystemDataPath() + "shaders/base.frag");
-	
-	shader.begin();
-	shader.setUniform3f( "gravity", 0, -98, 0 );
-	shader.end();
-	startColor.set( .9, .95, 1.95, 1 );
-	endColor.set( .6, 1.3, .2, 1 );
-	
-	spriteImage.loadImage(getVisualSystemDataPath() + "images/sphereNormal.png");
-	
-	
-	
-	//camera
-	camSpeed = 4;
-	
-	
-	//particle rendering 
-	bUpdateVbo = true;
-	indexCount = 0;
-	nextIndex = 0;
-	
 	positions = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
 	velocities = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
 	baseVelocities = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
@@ -78,9 +46,41 @@ void CloudsVisualSystemFireworks::selfBegin()
 	vbo.setTexCoordData( &lifeData[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	vbo.setIndexData( &indices[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	
-	indexCount = FIREWORKS_NUM_PARTICLES;
+	indexCount = 0;
+}
+
+void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath)
+{
+	
+}
+
+void CloudsVisualSystemFireworks::selfBegin()
+{
+	//shader
+	shader.load(getVisualSystemDataPath() + "shaders/base.vert", getVisualSystemDataPath() + "shaders/base.frag");
+	
+	shader.begin();
+	shader.setUniform3f( "gravity", 0, -98, 0 );
+	shader.end();
+	startColor.set( .9, .95, 1.95, 1 );
+	endColor.set( .6, 1.3, .2, 1 );
+	
+	spriteImage.loadImage(getVisualSystemDataPath() + "images/sphereNormal.png");
+	
+	
+	
+	//camera
+	camSpeed = 4;
+	
+	
+	//particle rendering 
+	bUpdateVbo = true;
+	indexCount = 0;
+	nextIndex = 0;
 	
 	nextFireworkExplosionTime = ofGetElapsedTimef() + 1;
+	
+//	bIs3D = true;
     
 }
 
@@ -158,11 +158,11 @@ void CloudsVisualSystemFireworks::selfDraw()
 	
 	ofPushStyle();
 	
-	ofBackgroundGradient( ofColor(70,75,100), ofColor(0,0,0), OF_GRADIENT_CIRCULAR );
+	//ofBackgroundGradient( ofColor(70,75,100), ofColor(0,0,0), OF_GRADIENT_CIRCULAR );
 	
 	ofEnableAlphaBlending();
 	
-	camera.begin();
+	//camera.begin();
 	
 	//	ofSetColor(255, 0, 0 );
 	//	for (int i=0; i < spawnPos.size(); i++) {	ofSphere( spawnPos[i], 3 );	}
@@ -186,7 +186,7 @@ void CloudsVisualSystemFireworks::selfDraw()
 	
 	shader.end();
 	
-	camera.end();
+	//camera.end();
 	
 	ofPopStyle();
 	
@@ -255,9 +255,9 @@ void CloudsVisualSystemFireworks::selfEnd()
     
 }
 
-ofCamera* CloudsVisualSystemFireworks::getCameraRef()
+ofCamera& CloudsVisualSystemFireworks::getCameraRef()
 {
-	return &camera;
+	return camera;
 }
 
 void CloudsVisualSystemFireworks::selfExit()

@@ -51,7 +51,7 @@ public:
 	
 	//END TEMPLATE
 	
-	ofCamera* getCameraRef();
+	ofCamera& getCameraRef();
 	
 	
 	void updateVbo();
@@ -100,7 +100,5 @@ public:
 
     
 protected:
-    
-    //  Your Stuff
-    //
+
 };
