@@ -1,9 +1,10 @@
 
 #include "CloudsVisualSystem.h"
-#include "CloudsRGBDCombinedRenderer.h"
+#include "CloudsRGBDVideoPlayer.h"
 
 static ofFbo staticRenderTarget;
 static ofImage sharedCursor;
+static CloudsRGBDVideoPlayer rgbdPlayer;
 
 //default render target is a statically shared FBO
 ofFbo& CloudsVisualSystem::getStaticRenderTarget(){
@@ -17,15 +18,20 @@ ofImage& CloudsVisualSystem::getCursor(){
 	return sharedCursor;
 }
 
+CloudsRGBDVideoPlayer& CloudsVisualSystem::getRGBDVideoPlayer(){
+	return rgbdPlayer;
+}
+
 CloudsVisualSystem::CloudsVisualSystem(){
 	isPlaying = false;
-	sharedRenderer = NULL;
+	timeline = NULL;
+//	sharedRenderer = NULL;
 	sharedRenderTarget = NULL;
 	bClearBackground = true;
 	bDrawToScreen = true;
 	bUseCameraTrack = false;
 	cameraTrack = NULL;
-	
+	pointcloudScale = .25;
 }
 
 CloudsVisualSystem::~CloudsVisualSystem(){
@@ -121,8 +127,7 @@ void CloudsVisualSystem::playSystem(){
 		loadGUIS();
 		hideGUIS();
 //		ofHideCursor();
-		
-		//    showGUIS(); //remove this so the gui doesn't keep popping up
+
 		cam.enableMouseInput();
 		for(map<string, ofxLight *>::iterator it = lights.begin(); it != lights.end(); ++it)
 		{
@@ -130,6 +135,8 @@ void CloudsVisualSystem::playSystem(){
 		}
 		
 		selfBegin();
+		
+		cloudsCamera.setup();
 		
 		timeline->setCurrentFrame(0);
 		if(cameraTrack->getKeyframes().size() > 0){
@@ -144,6 +151,8 @@ void CloudsVisualSystem::stopSystem(){
 	if(isPlaying){
 
 		selfEnd();
+		
+		cloudsCamera.end();
 		
 		hideGUIS();
 		saveGUIS();
@@ -188,9 +197,9 @@ string CloudsVisualSystem::getCurrentTopic(){
 	return currentTopic;
 }
 
-void CloudsVisualSystem::setRenderer(CloudsRGBDCombinedRenderer& newRenderer){
-	sharedRenderer = &newRenderer;
-}
+//void CloudsVisualSystem::setRenderer(CloudsRGBDVideoPlayer& newRenderer){
+//	sharedRenderer = &newRenderer;
+//}
 
 void CloudsVisualSystem::setupSpeaker(string speakerFirstName,
 									  string speakerLastName,
@@ -203,7 +212,8 @@ void CloudsVisualSystem::setupSpeaker(string speakerFirstName,
 	
 }
 
-void CloudsVisualSystem::speakerEnded(){
+void CloudsVisualSystem::speakerEnded()
+{
 	hasSpeaker = false;
 }
 
@@ -224,6 +234,15 @@ void CloudsVisualSystem::update(ofEventArgs & args)
         }
         bgColor->setHsb(bgHue->getPos(), bgSat->getPos(), bgBri->getPos(), 255);
         bgColor2->setHsb(bgHue2->getPos(), bgSat2->getPos(), bgBri2->getPos(), 255);
+		
+		
+		//update pointcloud stuff
+		
+		//update camera
+	  translatedHeadPosition = getRGBDVideoPlayer().headPosition * pointcloudScale + ofVec3f(0,0,pointcloudOffsetZ);// + positionOffset;
+	  cloudsCamera.lookTarget = translatedHeadPosition;// + positionOffset;
+		//LB: I added our positionOffset to the cloudsCamera positioning stuff above. Is there a better way to do this?
+		
         selfUpdate();
     }
 	
@@ -251,7 +270,8 @@ void CloudsVisualSystem::draw(ofEventArgs & args)
 	  
 	  
 	  //start our 3d scene
-		currentCamera->begin();
+		getCameraRef().begin();
+//		currentCamera->begin();
 	  
         ofRotateX(xRot->getPos());
         ofRotateY(yRot->getPos());
@@ -277,8 +297,17 @@ void CloudsVisualSystem::draw(ofEventArgs & args)
 		
         lightsEnd();
         
-		currentCamera->end();
+		getCameraRef().end();
 	  
+		//draw point cloud
+//		cloudsCamera.begin();
+//		ofPushMatrix();
+//		//move the pointcloud
+//
+//		selfDrawRGBD();
+//		ofPopMatrix();
+//		
+//		cloudsCamera.end();
 		
 		ofPushStyle();
 		ofPushMatrix();
@@ -302,9 +331,17 @@ void CloudsVisualSystem::draw(ofEventArgs & args)
 //		ofPopStyle();
 	}
     
-	timeline->draw();
+	if(timeline != NULL){
+		timeline->draw();
+	}
 	
     ofPopStyle();
+}
+
+void CloudsVisualSystem::setupRGBDTransforms(){
+	ofTranslate(0,0,pointcloudOffsetZ);
+	ofScale(pointcloudScale,pointcloudScale,pointcloudScale);
+	ofScale(-1, -1, 1);
 }
 
 void CloudsVisualSystem::exit(ofEventArgs & args)
@@ -652,6 +689,7 @@ void CloudsVisualSystem::setupMaterialParams()
 
 void CloudsVisualSystem::setupTimeLineParams()
 {
+	timeline = NULL;
     bShowTimeline = false;
 	bTimelineIsIndefinite = true;
     bDeleteTimelineTrack = false;
@@ -883,7 +921,7 @@ void CloudsVisualSystem::setupBackgroundGui()
     bgGui->addWidgetDown(toggle, OFX_UI_ALIGN_RIGHT, true);
     bgGui->addWidgetToHeader(toggle);
     bgGui->addSpacer();
-    
+
     bgGui->addSlider("HUE", 0.0, 255.0, bgHue->getPosPtr());
     bgGui->addSlider("SAT", 0.0, 255.0, bgSat->getPosPtr());
     bgGui->addSlider("BRI", 0.0, 255.0, bgBri->getPosPtr());
@@ -1469,8 +1507,13 @@ void CloudsVisualSystem::guiLightEvent(ofxUIEventArgs &e)
 
 void CloudsVisualSystem::setupTimeline()
 {
-
-    timeline = new ofxTimeline();
+    if(timeline != NULL)
+    {
+        delete timeline;
+        timeline = NULL;
+    }
+	
+	timeline = new ofxTimeline();
 	timeline->setName("Working");
 	timeline->setWorkingFolder(getVisualSystemDataPath()+"Presets/Working/Timeline/");
 	
@@ -1513,7 +1556,6 @@ void CloudsVisualSystem::resetTimeline()
 	cameraTrack->lockCameraToTrack = false;
 	delete cameraTrack;
 	cameraTrack = NULL;
-    timeline->setPageName(ofToUpper(getSystemName()));
     setupTimeline();
 }
 
@@ -2225,9 +2267,15 @@ void CloudsVisualSystem::loadPresetGUISFromPath(string presetPath)
 	
 	selfPresetLoaded(presetPath);
 	
-	if(bShowTimeline){
-		stackGuiWindows();
+	if(bTimelineIsIndefinite){
+		timeline->setLoopType(OF_LOOP_NORMAL);
 	}
+	else{
+		timeline->setLoopType(OF_LOOP_NONE);
+	}
+//	if(bShowTimeline){
+		stackGuiWindows();
+//	}
 }
 
 void CloudsVisualSystem::savePresetGUIS(string presetName)
@@ -2341,6 +2389,11 @@ ofCamera& CloudsVisualSystem::getCameraRef(){
 void CloudsVisualSystem::setDrawToScreen( bool state )
 {
 	bDrawToScreen = state;
+}
+
+
+float CloudsVisualSystem::getCurrentAudioAmplitude(){
+	
 }
 
 bool CloudsVisualSystem::getDrawToScreen()

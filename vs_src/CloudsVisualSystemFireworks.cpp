@@ -33,7 +33,7 @@ void CloudsVisualSystemFireworks::selfSetupGui(){
 	
 	customGui->addSlider("firework gravity", -1, 1, &(fireworkGravity.y) );
 	
-	customGui->addSlider("camSpeed", -.1, 5, &camSpeed );
+	customGui->addSlider("camSpeed", -.1, 10, &camSpeed );
 	
 	
 	
@@ -42,6 +42,7 @@ void CloudsVisualSystemFireworks::selfSetupGui(){
 	customGui->addToggle("Custom Toggle", &customToggle);
 	
 	startColorSampler =  customGui->addImageSampler("birth color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
+	
 	
 	endColorSampler =  customGui->addImageSampler("death color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	

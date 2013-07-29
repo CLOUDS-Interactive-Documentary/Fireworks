@@ -5,6 +5,7 @@
 #include "ofxTimeline.h"
 #include "ofxUI.h"
 #include "ofxTLCameraTrack.h"
+#include "CloudsRGBDCamera.h"
 
 //tenuous
 #include "ofxLight.h"
@@ -18,7 +19,7 @@
  * methods for interacting with play time duration, on screen start and stop, and accessing CLOUDS global state
  */
 
-class CloudsRGBDCombinedRenderer;
+class CloudsRGBDVideoPlayer;
 
 enum ofxViewType
 {
@@ -47,6 +48,7 @@ class CloudsVisualSystem {
 	};
 	
 	static ofFbo& getStaticRenderTarget(); //default
+	static CloudsRGBDVideoPlayer& getRGBDVideoPlayer();
 	
 	ofFbo& getSharedRenderTarget();
 	ofImage& getCursor();
@@ -94,6 +96,8 @@ class CloudsVisualSystem {
 	
 	virtual string getSystemName();
 	
+	void setupRGBDTransforms();
+	
 	//Data Folder Path
     string getVisualSystemDataPath();
 	ofxTimeline* getTimeline();
@@ -123,7 +127,7 @@ class CloudsVisualSystem {
 	void playSystem();
 	void stopSystem();
 	
-	void setRenderer(CloudsRGBDCombinedRenderer& newRenderer);
+//	void setRenderer(CloudsRGBDVideoPlayer& newRenderer);
 
 	void setupSpeaker(string speakerFirstName,
 					  string speakerLastName,
@@ -132,7 +136,7 @@ class CloudsVisualSystem {
 	void speakerEnded();
 	
 
-
+	
 	//how much time left to show this visual system?
 	//once seconds is set to zero the end() event will be called by the controller
 	float getSecondsRemaining();
@@ -225,9 +229,13 @@ class CloudsVisualSystem {
     
 	void setCurrentCamera( ofCamera& cam );
 	void setCurrentCamera( ofCamera* swappedInCam );
-	ofCamera& getCameraRef();
+	virtual ofCamera& getCameraRef();
 	ofCamera* getCurrentCamera();
 	
+	ofVec3f translatedHeadPosition;
+	float pointcloudScale;
+	float pointcloudOffsetZ;
+	CloudsRGBDCamera cloudsCamera;
 	
 	//LB
 	ofVec3f getCameraPosition();
@@ -239,6 +247,10 @@ class CloudsVisualSystem {
 	
 	void setDrawToScreen( bool state );
 	bool getDrawToScreen();
+	
+
+//	void loadTestVideo();
+	float getCurrentAudioAmplitude();
 	
   protected:
 		
@@ -299,7 +311,7 @@ class CloudsVisualSystem {
     float debugGridSize;
 	bool bClearBackground;
 	bool bDrawToScreen;
-	bool bIs3D;
+//	bool bIs3D;
 	
     //CAM
     float camDistance;
@@ -339,7 +351,7 @@ class CloudsVisualSystem {
 	
 	//these variables are set by the playback controller when displaying
 	//ways to interact with the pointcloud data
-	CloudsRGBDCombinedRenderer* sharedRenderer;
+//	CloudsRGBDVideoPlayer* sharedRenderer;
 	//set to true if the pointcloud renderer has valid speaker
 	bool hasSpeaker;
 	

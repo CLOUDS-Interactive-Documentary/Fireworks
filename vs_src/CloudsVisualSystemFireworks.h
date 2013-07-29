@@ -140,8 +140,6 @@ class CloudsVisualSystemFireworks : public CloudsVisualSystem {
 	vector <float> startTimes;
 	float fireWorkExplosionTime;
 	
-	//render attributes
-	ofVec4f startColor, endColor;
 	
 	ofxUISuperCanvas* fireworksRenderGui;
 	ofxUISuperCanvas* fireworksBehaviorGui;
@@ -157,6 +155,9 @@ class CloudsVisualSystemFireworks : public CloudsVisualSystem {
 	ofVec3f nextExplosion;
 
 protected:
+	
+	//render attributes
+	ofVec4f startColor, endColor;
 	
 	ofxUISuperCanvas* customGui;
 	bool customToggle;
@@ -179,4 +180,5 @@ protected:
 	ofxUIImageSampler* endColorSampler;
 	
 	vector <ofVec3f> debugSpheres;
+	
 };
