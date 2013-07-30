@@ -22,7 +22,7 @@ public:
 	//This determines your data path so name it at first!
 	//ie getVisualSystemDataPath() uses this
     string getSystemName(){
-		return "EmptySystem";
+		return "Fireworks";
 	}
 	
 	//These methods let us add custom GUI parameters and respond to their events
