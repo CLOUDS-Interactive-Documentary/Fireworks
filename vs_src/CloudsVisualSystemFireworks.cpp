@@ -12,7 +12,7 @@
 
 //These methods let us add custom GUI parameters and respond to their events
 void CloudsVisualSystemFireworks::selfSetupGui(){
-
+	
 	customGui = new ofxUISuperCanvas("CUSTOM", gui);
 	customGui->copyCanvasStyle(gui);
 	customGui->copyCanvasProperties(gui);
@@ -33,22 +33,21 @@ void CloudsVisualSystemFireworks::selfSetupGui(){
 	
 	customGui->addSlider("firework gravity", -1, 1, &(fireworkGravity.y) );
 	
-	customGui->addSlider("camSpeed", -.1, 10, &camSpeed );
+	customGui->addSlider("camSpeed", -.1, 5, &camSpeed );
 	
 	
 	
 	
-//	customGui->addButton("Custom Button", false);
+	//	customGui->addButton("Custom Button", false);
 	customGui->addToggle("Custom Toggle", &customToggle);
 	
 	startColorSampler =  customGui->addImageSampler("birth color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	
-	
 	endColorSampler =  customGui->addImageSampler("death color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	
 	
-//	customGui->addSlider("farClip", 100, 10000, &farClip);
-
+	//	customGui->addSlider("farClip", 100, 10000, &farClip);
+	
 	ofAddListener(customGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
 	
 	guis.push_back(customGui);
@@ -74,12 +73,12 @@ void CloudsVisualSystemFireworks::selfGuiEvent(ofxUIEventArgs &e){
 		ofFloatColor col =  sampler->getColor();
 		endColor.set( col.r, col.g, col.b, 1. );
 	}
-//	else if( e.widget->getName() == "farClip"){
-//		
-//		float clip = ((ofxUISlider *) e.widget)->getValue();
-//		camera.setFarClip( 500 );
-//		camera.setNearClip( 10 );
-//	}
+	//	else if( e.widget->getName() == "farClip"){
+	//
+	//		float clip = ((ofxUISlider *) e.widget)->getValue();
+	//		camera.setFarClip( 500 );
+	//		camera.setNearClip( 10 );
+	//	}
 }
 
 //Use system gui for global or logical settings, for exmpl
@@ -92,7 +91,7 @@ void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e){
 }
 //use render gui for display settings, like changing colors
 void CloudsVisualSystemFireworks::selfSetupRenderGui(){
-
+	
 }
 
 void CloudsVisualSystemFireworks::guiRenderEvent(ofxUIEventArgs &e){
@@ -103,27 +102,27 @@ void CloudsVisualSystemFireworks::guiRenderEvent(ofxUIEventArgs &e){
 // This will be called during a "loading" screen, so any big images or
 // geometry should be loaded here
 void CloudsVisualSystemFireworks::selfSetup(){
-
-	/*
-//	if(ofFile::doesFileExist(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov")){
-//		getRGBDVideoPlayer().setup(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov",
-//								   getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.xml" );
-//		
-//		getRGBDVideoPlayer().swapAndPlay();
-//		
-//		for(int i = 0; i < 640; i += 2){
-//			for(int j = 0; j < 480; j+=2){
-//				simplePointcloud.addVertex(ofVec3f(i,j,0));
-//			}
-//		}
-//		
-//		pointcloudShader.load(getVisualSystemDataPath() + "shaders/rgbdcombined");
-//		
-//	}
-//	
 	
-//	someImage.loadImage( getVisualSystemDataPath() + "images/someImage.png";
-	*/
+	/*
+	 //	if(ofFile::doesFileExist(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov")){
+	 //		getRGBDVideoPlayer().setup(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov",
+	 //								   getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.xml" );
+	 //
+	 //		getRGBDVideoPlayer().swapAndPlay();
+	 //
+	 //		for(int i = 0; i < 640; i += 2){
+	 //			for(int j = 0; j < 480; j+=2){
+	 //				simplePointcloud.addVertex(ofVec3f(i,j,0));
+	 //			}
+	 //		}
+	 //
+	 //		pointcloudShader.load(getVisualSystemDataPath() + "shaders/rgbdcombined");
+	 //
+	 //	}
+	 //
+	 
+	 //	someImage.loadImage( getVisualSystemDataPath() + "images/someImage.png";
+	 */
 	
 	FIREWORKS_NUM_PARTICLES = 200000;
 	
@@ -138,7 +137,9 @@ void CloudsVisualSystemFireworks::selfSetup(){
 	float t = ofGetElapsedTimef();
 	
 	for (int i=0; i<FIREWORKS_NUM_PARTICLES; i++) {
-		indices[i] = i;
+		//		indices[i] = i;
+		//		lifeData[i].r = 0;
+		//		lifeData[i].g = .1;
 	}
 	
 	explodeFireWorkAtRandomPoint();
@@ -150,7 +151,7 @@ void CloudsVisualSystemFireworks::selfSetup(){
 	
 	vbo.setColorData( &lifeData[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	
-	indexCount = FIREWORKS_NUM_PARTICLES;
+	//	indexCount = 0;// FIREWORKS_NUM_PARTICLES;
 	
 	colorSampleImage.loadImage( getVisualSystemDataPath() + "GUI/defaultColorPalette.png" );
 }
@@ -197,18 +198,18 @@ void CloudsVisualSystemFireworks::selfBegin(){
 	indexCount = 0;
 	nextIndex = 0;
 	
-	nextFireworkExplosionTime = ofGetElapsedTimef() + 3;
+	nextFireworkExplosionTime = ofGetElapsedTimef() + 1;
 	
 	ofDisableArbTex();
 	
-	sprites["star"].loadImage(  getVisualSystemDataPath() + "images/star.png" );
+	//	sprites["star"].loadImage(  getVisualSystemDataPath() + "images/star.png" );
 	sprites["triangle"].loadImage(  getVisualSystemDataPath() + "images/triangle-sprite.png" );
 	sprites["square"].loadImage(  getVisualSystemDataPath() + "images/square-sprite.png" );
 	sprites["circle"].loadImage(  getVisualSystemDataPath() + "images/circle-sprite.png" );
 	
 	ofEnableArbTex();
 	
-	explodeFireWorkAtRandomPoint();
+	//	explodeFireWorkAtRandomPoint();
 	
 }
 
@@ -221,7 +222,7 @@ void CloudsVisualSystemFireworks::selfSceneTransformation(){
 //normal update call
 void CloudsVisualSystemFireworks::selfUpdate()
 {
-	    
+	
 	//camera
 	camPos = camera.getPosition();
 	camTarget = camera.getTarget().getPosition();
@@ -271,12 +272,12 @@ void CloudsVisualSystemFireworks::selfUpdate()
 			trailPoint( spawnPos[i], spawnVel[i].normalized() );
 		}
 		else{
-//			if(nextFireworkExplosionTime < t){
-//				debugSpheres.push_back( spawnPos[i] );
-//				cout << "debugSpheres.size(): "<< debugSpheres.size() << endl;
-//				
-//				explodeFireWorkAtPoint( spawnPos[i] );
-//			}
+			//			if(nextFireworkExplosionTime < t){
+			//				debugSpheres.push_back( spawnPos[i] );
+			//				cout << "debugSpheres.size(): "<< debugSpheres.size() << endl;
+			//
+			//				explodeFireWorkAtPoint( spawnPos[i] );
+			//			}
 			
 			spawnPos.erase( spawnPos.begin()+i );
 			spawnVel.erase( spawnVel.begin()+i );
@@ -298,13 +299,13 @@ void CloudsVisualSystemFireworks::selfUpdate()
 // you can change the camera by returning getCameraRef()
 void CloudsVisualSystemFireworks::selfDraw(){
 	
-//	ofPushMatrix();
-//	setupRGBDTransforms();
-//	pointcloudShader.begin();
-//	getRGBDVideoPlayer().setupProjectionUniforms(pointcloudShader);
-//	simplePointcloud.drawVertices();
-//	pointcloudShader.end();
-//	ofPopMatrix();
+	//	ofPushMatrix();
+	//	setupRGBDTransforms();
+	//	pointcloudShader.begin();
+	//	getRGBDVideoPlayer().setupProjectionUniforms(pointcloudShader);
+	//	simplePointcloud.drawVertices();
+	//	pointcloudShader.end();
+	//	ofPopMatrix();
 	
 	
 	
@@ -315,12 +316,12 @@ void CloudsVisualSystemFireworks::selfDraw(){
 	ofPushStyle();
 	
 	ofEnableAlphaBlending();
-
-//	ofSetColor(255, 0, 0 );
-//	for (int i=0; i < spawnPos.size(); i++) {	ofSphere( spawnPos[i], 2 );	}
-//	
-//	ofSetColor(255, 0, 0 );
-//	for (int i=0; i < debugSpheres.size(); i++) {	ofSphere( debugSpheres[i], 2 );	}
+	
+	//	ofSetColor(255, 0, 0 );
+	//	for (int i=0; i < spawnPos.size(); i++) {	ofSphere( spawnPos[i], 2 );	}
+	//
+	//	ofSetColor(255, 0, 0 );
+	//	for (int i=0; i < debugSpheres.size(); i++) {	ofSphere( debugSpheres[i], 2 );	}
 	
 	
 	ofColor( 255, 255, 255, 50 );
@@ -348,7 +349,7 @@ void CloudsVisualSystemFireworks::selfDraw(){
 	shader.setUniformTexture("squareMap", sprites["square"].getTextureReference(), 1 );
 	shader.setUniformTexture("circleMap", sprites["circle"].getTextureReference(), 0 );
 	
-	vbo.drawElements( GL_POINTS, max(0,indexCount-1) );
+	vbo.drawElements( GL_POINTS, indexCount );
 	
 	sprites["cicle"].unbind();
 	sprites["square"].unbind();
@@ -389,7 +390,7 @@ void CloudsVisualSystemFireworks::trailPoint( ofVec3f point, ofVec3f vel, int co
 
 void CloudsVisualSystemFireworks::emitFromPoint( ofVec3f point, ofVec3f dir, float lifespan, float t )
 {
-
+	
 	int i = nextIndex;
 	nextIndex ++;
 	if( nextIndex > FIREWORKS_NUM_PARTICLES ) nextIndex = 0;
@@ -431,15 +432,15 @@ void CloudsVisualSystemFireworks::explodeFireWorkAtRandomPoint()
 {
 	float t = ofGetElapsedTimef();
 	nextFireworkExplosionTime = t + ofRandom( minExplosionTime, maxExplosionTime );
-
+	
 	
 	ofVec3f offset( ofRandom(-1, 1), ofRandom(-.1,.1), ofRandom(-1, 1));
 	offset.normalize();
 	offset *= 300;
 	
-//	offset.x = abs( offset.x );
-//	offset.y = abs( offset.y );
-//	offset.z = abs( offset.z );
+	//	offset.x = abs( offset.x );
+	//	offset.y = abs( offset.y );
+	//	offset.z = abs( offset.z );
 	
 	
 	int randFWType = ofRandom(0,5);
@@ -467,7 +468,7 @@ void CloudsVisualSystemFireworks::selfDrawDebug(){
 }
 // or you can use selfDrawBackground to do 2D drawings that don't use the 3D camera
 void CloudsVisualSystemFireworks::selfDrawBackground(){
-
+	
 	//turn the background refresh off
 	//bClearBackground = false;
 	
@@ -476,7 +477,7 @@ void CloudsVisualSystemFireworks::selfDrawBackground(){
 // Right after this selfUpdate() and selfDraw() won't be called any more
 void CloudsVisualSystemFireworks::selfEnd(){
 	
-//	simplePointcloud.clear();
+	//	simplePointcloud.clear();
 	
     delete[] positions;
     delete[] velocities;
