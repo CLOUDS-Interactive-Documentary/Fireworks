@@ -27,26 +27,19 @@ void CloudsVisualSystemFireworks::selfSetupGui(){
 	
 	customGui->addSlider("minParticleVelocity", 0, 100, &minVel);
 	customGui->addSlider("maxParticleVelocity", 0, 200, &maxVel );
-	customGui->addSlider("maxFireworkVelocity", 1, 5, &maxFWVel );
+	customGui->addSlider("maxFireworkVelocity", 1, 300, &maxFWVel );
 	
 	customGui->addSlider("particle gravity", -100, 100, &(particleGravity.y) );
 	
 	customGui->addSlider("firework gravity", -1, 1, &(fireworkGravity.y) );
 	
 	customGui->addSlider("camSpeed", -.1, 5, &camSpeed );
-	
-	
-	
-	
-	//	customGui->addButton("Custom Button", false);
+		
 	customGui->addToggle("Custom Toggle", &customToggle);
 	
 	startColorSampler =  customGui->addImageSampler("birth color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	
 	endColorSampler =  customGui->addImageSampler("death color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
-	
-	
-	//	customGui->addSlider("farClip", 100, 10000, &farClip);
 	
 	ofAddListener(customGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
 	
@@ -73,12 +66,6 @@ void CloudsVisualSystemFireworks::selfGuiEvent(ofxUIEventArgs &e){
 		ofFloatColor col =  sampler->getColor();
 		endColor.set( col.r, col.g, col.b, 1. );
 	}
-	//	else if( e.widget->getName() == "farClip"){
-	//
-	//		float clip = ((ofxUISlider *) e.widget)->getValue();
-	//		camera.setFarClip( 500 );
-	//		camera.setNearClip( 10 );
-	//	}
 }
 
 //Use system gui for global or logical settings, for exmpl
@@ -89,42 +76,16 @@ void CloudsVisualSystemFireworks::selfSetupSystemGui(){
 void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e){
 	
 }
-//use render gui for display settings, like changing colors
-void CloudsVisualSystemFireworks::selfSetupRenderGui(){
-	
-}
-
-void CloudsVisualSystemFireworks::guiRenderEvent(ofxUIEventArgs &e){
-	
-}
 
 // selfSetup is called when the visual system is first instantiated
 // This will be called during a "loading" screen, so any big images or
 // geometry should be loaded here
-void CloudsVisualSystemFireworks::selfSetup(){
+void CloudsVisualSystemFireworks::selfSetup()
+{
+	fireworksRenderGui = NULL;
+	fireworksBehaviorGui = NULL;
 	
-	/*
-	 //	if(ofFile::doesFileExist(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov")){
-	 //		getRGBDVideoPlayer().setup(getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.mov",
-	 //								   getVisualSystemDataPath() + "TestVideo/Jer_TestVideo.xml" );
-	 //
-	 //		getRGBDVideoPlayer().swapAndPlay();
-	 //
-	 //		for(int i = 0; i < 640; i += 2){
-	 //			for(int j = 0; j < 480; j+=2){
-	 //				simplePointcloud.addVertex(ofVec3f(i,j,0));
-	 //			}
-	 //		}
-	 //
-	 //		pointcloudShader.load(getVisualSystemDataPath() + "shaders/rgbdcombined");
-	 //
-	 //	}
-	 //
-	 
-	 //	someImage.loadImage( getVisualSystemDataPath() + "images/someImage.png";
-	 */
-	
-	FIREWORKS_NUM_PARTICLES = 200000;
+	FIREWORKS_NUM_PARTICLES = 400000;
 	
 	positions = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
 	velocities = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
@@ -142,7 +103,7 @@ void CloudsVisualSystemFireworks::selfSetup(){
 		//		lifeData[i].g = .1;
 	}
 	
-	explodeFireWorkAtRandomPoint();
+	//	explodeFireWorkAtRandom();
 	
 	vbo.setVertexData( &positions[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
 	vbo.setNormalData( &velocities[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
@@ -154,18 +115,55 @@ void CloudsVisualSystemFireworks::selfSetup(){
 	//	indexCount = 0;// FIREWORKS_NUM_PARTICLES;
 	
 	colorSampleImage.loadImage( getVisualSystemDataPath() + "GUI/defaultColorPalette.png" );
-}
-
-// selfPresetLoaded is called whenever a new preset is triggered
-// it'll be called right before selfBegin() and you may wish to
-// refresh anything that a preset may offset, such as stored colors or particles
-void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath){
+	
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/dodecahedron.txt", dodecagedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/octahedron.txt", octahedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/tetrahedron.txt", tetrahedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/icosahedron.txt", icosahedronPoints );
+//	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/octahedron.txt", octahedronPoints );
+//	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/tetrahedron.txt", tetrahedronPoints );
+	
+	// this is our buffer to stroe the text data
+//    ofBuffer buffer = ofBufferFromFile("animationTargets/dodecahedron.txt");
+//    dodecagedronPoints.clear();
+//    if(buffer.size()) {
+//		
+//		while (buffer.isLastLine() == false) {
+//			string line = buffer.getNextLine();
+//			
+//			vector<string> vals = ofSplitString( line, ",");
+//		
+//			dodecagedronPoints.push_back( ofVec3f( ofToFloat(vals[0]),ofToFloat(vals[1]),ofToFloat(vals[2]) ) );
+//		}
+//
+//    }
+//	
+//	for (int i=0; i<dodecagedronPoints.size(); i++) {
+//		cout << dodecagedronPoints[i] << endl;
+//	}
 	
 }
 
-// selfBegin is called when the system is ready to be shown
-// this is a good time to prepare for transitions
-// but try to keep it light weight as to not cause stuttering
+void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f>& points )
+{
+	ofBuffer buffer = ofBufferFromFile( loc );
+    points.clear();
+    if(buffer.size()) {
+		
+		while (buffer.isLastLine() == false) {
+			string line = buffer.getNextLine();
+			
+			vector<string> vals = ofSplitString( line, ",");
+			
+			points.push_back( ofVec3f( ofToFloat(vals[0]),ofToFloat(vals[1]),ofToFloat(vals[2]) ) );
+		}
+		
+    }
+	
+	buffer.clear();
+}
+
+
 void CloudsVisualSystemFireworks::selfBegin(){
 	
 	//particle behavior
@@ -174,7 +172,6 @@ void CloudsVisualSystemFireworks::selfBegin(){
 	minVel = 4;
 	maxVel = 60;
 	maxFWVel = 2.4;
-	
 	
 	//shader
 	shader.load(getVisualSystemDataPath() + "shaders/base.vert", getVisualSystemDataPath() + "shaders/base.frag");
@@ -197,6 +194,7 @@ void CloudsVisualSystemFireworks::selfBegin(){
 	bUpdateVbo = true;
 	indexCount = 0;
 	nextIndex = 0;
+	numSprites = 0;
 	
 	nextFireworkExplosionTime = ofGetElapsedTimef() + 1;
 	
@@ -209,36 +207,102 @@ void CloudsVisualSystemFireworks::selfBegin(){
 	
 	ofEnableArbTex();
 	
-	//	explodeFireWorkAtRandomPoint();
+	//	explodeFireWorkAtRandom();
 	
+	emitters.resize( 1000 );
+	emitterCount = 0;
+	
+	for(int i=0; i<10; i++){
+		emitters[i].setup( 10, ofVec3f(), ofVec3f( ofRandom(-300, 300), ofRandom(-300, 300), ofRandom(-300, 300) ) );
+		emitterCount++;
+	}
+	
+	camera.setPosition(0, 0, 0);
+	camTarget.set( 0,0,300);
+	
+	glowFbo0.allocate( ofGetWidth(), ofGetHeight(), GL_RGB );
+	glowFbo1.allocate( glowFbo0.getWidth()/2, glowFbo0.getHeight()/2, GL_RGB );;
+	glowFbo2.allocate( glowFbo1.getWidth()/2, glowFbo1.getHeight()/2, GL_RGB );;
+	glowFbo3.allocate( glowFbo2.getWidth()/2, glowFbo2.getHeight()/2, GL_RGB );;
+	glowFbo4.allocate( glowFbo3.getWidth()/2, glowFbo3.getHeight()/2, GL_RGB );;
+	glowFbo5.allocate( glowFbo4.getWidth()/2, glowFbo4.getHeight()/2, GL_RGB );;
+	glowFbo6.allocate( glowFbo5.getWidth()/2, glowFbo5.getHeight()/2, GL_RGB );;
+	
+	glowShader.load(getVisualSystemDataPath() + "shaders/post");
 }
 
-//do things like ofRotate/ofTranslate here
-//any type of transformation that doesn't have to do with the camera
-void CloudsVisualSystemFireworks::selfSceneTransformation(){
-	
-}
 
-//normal update call
 void CloudsVisualSystemFireworks::selfUpdate()
 {
+	for (int i=emitterCount-1; i>=0; i--)
+	{
+		emitters[i].update();
+		
+		emitters[i].pos += fireworkGravity * emitters[i].span * emitters[i].age * 10;
+		
+		if(emitters[i].bCompleted)
+		{
+//			emitters.erase(emitters.begin() + i);
+			emitterCount--;
+			emitters[i] = emitters[emitterCount];
+			if(emitterCount <0){
+				ofLog(OF_LOG_ERROR)	<< "emitterCount shouldn't be below 0";
+			}
+		}
+		
+		else
+		{
+			ofVec3f p0 = emitters[i].pos;
+//			p0.rotate( emitters[i].age * emitters[i].targetRot, emitters[i].origin + ofVec3f(.1), ofVec3f(0,1,0));
+			ofVec3f nScl = p0 * .01;
+			float nx = ofSignedNoise(nScl.x + emitters[i].age, nScl.y, nScl.z);
+			float ny = ofSignedNoise(nScl.x, nScl.y + emitters[i].age, nScl.z);
+			float nz = ofSignedNoise(nScl.x, nScl.y, nScl.z + emitters[i].age);
+			p0 += ofVec3f( nx, ny, nz ) * 10. * emitters[i].age;
+				
+			trailPoint( p0, emitters[i].vel, 4 );
+		}
+	}
 	
 	//camera
-	camPos = camera.getPosition();
-	camTarget = camera.getTarget().getPosition();
+	//calc the center of the explositions so we stear to that
+	ofVec3f centroid;
 	
-	ofVec3f cameraAim = (camTarget - camPos).normalize();
+	for (int i=0; i<emitterCount; i++) {
+		centroid += emitters[i].pos;
+	}
 	
-	camPos += cameraAim * camSpeed;
-	camTarget += cameraAim * camSpeed;
+	centroid /= emitterCount;
 	
-	camera.setPosition( camPos );
-	camera.getTarget().setPosition( camTarget );
+	float centroidBlendVal = .99;
+	emitterCentroid = centroidBlendVal * emitterCentroid + centroid*(1. - centroidBlendVal);
 	
-	nearClip = 10;
-	farClip = 1000;
-	camera.setFarClip( farClip );
-	camera.setNearClip( nearClip );
+
+	ofVec3f eul = camera.getOrientationEuler();// + ofVec3f( ofNoise( ofGetElapsedTimef() * .1), ofNoise( ofGetElapsedTimef() * .1 + .5), 0 ) * 20.;
+	float xDamp = ofMap( abs(eul.x), 70, 90, 1, 0, true );//ofClamp( max(0.f, 1.f - abs(eul.x) - 80) / 10., 0., 1.);
+	
+	float noiseTimeScl = .1;
+	float noiseOffsetScl = 800;
+	float mouseScl = .25;
+	
+	float noiseValX = ofSignedNoise( ofGetElapsedTimef() * noiseTimeScl + 1. ) * noiseOffsetScl;
+	float noiseValY = ofSignedNoise( ofGetElapsedTimef() * noiseTimeScl ) * noiseOffsetScl;
+	
+	float pan = ofMap(ofGetMouseX() + noiseValX, 0, ofGetWidth(), mouseScl, -mouseScl);
+	float tilt = ofMap(ofGetMouseY() + noiseValY, 0, ofGetHeight(), -mouseScl, mouseScl) * xDamp;
+	if(abs(eul.x) < 90) camera.tilt( tilt );
+	camera.pan( pan );
+	
+	float roll = abs(pan) * pan * -5.;
+	camera.roll( roll );
+	
+	camera.move(0, abs(roll), 0);
+	
+	ofVec3f vel = camera.getLookAtDir();
+	camera.move( vel * camSpeed );
+	
+	float targetDistance = 300;
+	camTarget = vel * targetDistance + camera.getPosition();
 	
 	
 	//particles
@@ -257,7 +321,6 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	
 	if(updateIndices){
 		vbo.updateIndexData( indices, indexCount );
-		//		cout << indexCount << endl;
 	}
 	
 	
@@ -272,100 +335,28 @@ void CloudsVisualSystemFireworks::selfUpdate()
 			trailPoint( spawnPos[i], spawnVel[i].normalized() );
 		}
 		else{
-			//			if(nextFireworkExplosionTime < t){
-			//				debugSpheres.push_back( spawnPos[i] );
-			//				cout << "debugSpheres.size(): "<< debugSpheres.size() << endl;
-			//
-			//				explodeFireWorkAtPoint( spawnPos[i] );
-			//			}
-			
 			spawnPos.erase( spawnPos.begin()+i );
 			spawnVel.erase( spawnVel.begin()+i );
 			spawnTime.erase( spawnTime.begin()+i );
 		}
 	}
 	
-	if(	bUpdateVbo ){
+	if(	bUpdateVbo )
+	{
 		updateVbo();
 	}
 	
-	if( nextFireworkExplosionTime < t ){
-		
-		explodeFireWorkAtRandomPoint();
+	if( nextFireworkExplosionTime < t )
+	{
+		explodeFireWorkAtRandom();
 	}
+	
 }
 
-// selfDraw draws in 3D using the default ofEasyCamera
-// you can change the camera by returning getCameraRef()
-void CloudsVisualSystemFireworks::selfDraw(){
-	
-	//	ofPushMatrix();
-	//	setupRGBDTransforms();
-	//	pointcloudShader.begin();
-	//	getRGBDVideoPlayer().setupProjectionUniforms(pointcloudShader);
-	//	simplePointcloud.drawVertices();
-	//	pointcloudShader.end();
-	//	ofPopMatrix();
-	
-	
-	
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_NORMALIZE);
-	//    mat->begin();
-	
-	ofPushStyle();
-	
-	ofEnableAlphaBlending();
-	
-	//	ofSetColor(255, 0, 0 );
-	//	for (int i=0; i < spawnPos.size(); i++) {	ofSphere( spawnPos[i], 2 );	}
-	//
-	//	ofSetColor(255, 0, 0 );
-	//	for (int i=0; i < debugSpheres.size(); i++) {	ofSphere( debugSpheres[i], 2 );	}
-	
-	
-	ofColor( 255, 255, 255, 50 );
-	
-	glEnable( GL_DEPTH_TEST );
-	glEnable( GL_VERTEX_PROGRAM_POINT_SIZE );
-	
-	ofBlendMode( OF_BLENDMODE_ADD );
-	
-	ofDisableArbTex();
-	ofEnablePointSprites();
-	
-	shader.begin();
-	shader.setUniform1f( "time", ofGetElapsedTimef() );
-	shader.setUniform1f( "nearClip", camera.getNearClip() );
-	shader.setUniform1f( "farClip", camera.getFarClip() );
-	shader.setUniform3f("cameraPosition", camPos.x, camPos.y, camPos.z );
-	shader.setUniform4f("startColor", startColor.x, startColor.y, startColor.z, startColor.w );
-	shader.setUniform4f("endColor", endColor.x, endColor.y, endColor.z, endColor.w );
-	
-	shader.setUniform3f( "gravity", particleGravity.x, particleGravity.y, particleGravity.z );
-	
-	shader.setUniformTexture("starMap", sprites["star"].getTextureReference(), 3 );
-	shader.setUniformTexture("triangleMap", sprites["triangle"].getTextureReference(), 2 );
-	shader.setUniformTexture("squareMap", sprites["square"].getTextureReference(), 1 );
-	shader.setUniformTexture("circleMap", sprites["circle"].getTextureReference(), 0 );
-	
-	vbo.drawElements( GL_POINTS, indexCount );
-	
-	sprites["cicle"].unbind();
-	sprites["square"].unbind();
-	sprites["triangle"].unbind();
-	sprites["star"].unbind();
-	
-	shader.end();
-	
-	ofPopStyle();
-	
-	//    mat->end();
-    glDisable(GL_NORMALIZE);
-    glDisable(GL_DEPTH_TEST);
-	
-	ofDisablePointSprites();
-	ofEnableArbTex();
+
+void CloudsVisualSystemFireworks::selfDraw()
+{
+	//nothing to see here
 }
 
 
@@ -376,7 +367,7 @@ void CloudsVisualSystemFireworks::updateVbo()
 	vbo.updateNormalData( &velocities[0], total );
 	vbo.updateColorData( &lifeData[0], total );
 	
-	vbo.updateIndexData( &indices[0], indexCount );
+	vbo.updateIndexData( &indices[0], numSprites );
 	
 	bUpdateVbo = false;
 }
@@ -404,22 +395,44 @@ void CloudsVisualSystemFireworks::emitFromPoint( ofVec3f point, ofVec3f dir, flo
 	lifeData[i].set( t, lifespan, 0, 0 );
 	
 	bUpdateVbo = true;
+	
+	numSprites = min( numSprites+1, FIREWORKS_NUM_PARTICLES );
 }
 
 void CloudsVisualSystemFireworks::explodeFireWork( ofVec3f origin, ofVec3f vel )
 {
 	fireWorkExplosionTime = ofGetElapsedTimef();
 	
-	for (int i=0; i<30; i++) {
-		spawnTime.push_back(fireWorkExplosionTime);
-		spawnPos.push_back( origin );
-		spawnVel.push_back( ofVec3f( ofRandom(-maxFWVel,maxFWVel), ofRandom(0,maxFWVel*2), ofRandom(-maxFWVel,maxFWVel) ) );
-	}
 	
+	int numEmittersPerExplosion = 50;
+	for(int i=0; i<numEmittersPerExplosion; i++){
+		emitterCount++;
+		emitters[emitterCount].setup( ofRandom(1.5, 3.), origin, origin + ofVec3f( ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel) ) );
+
+	}
 }
 
 
+//do things like ofRotate/ofTranslate here
+//any type of transformation that doesn't have to do with the camera
+void CloudsVisualSystemFireworks::selfSceneTransformation(){
+	
+}
+//use render gui for display settings, like changing colors
+void CloudsVisualSystemFireworks::selfSetupRenderGui(){
+	
+}
 
+void CloudsVisualSystemFireworks::guiRenderEvent(ofxUIEventArgs &e){
+	
+}
+
+// selfPresetLoaded is called whenever a new preset is triggered
+// it'll be called right before selfBegin() and you may wish to
+// refresh anything that a preset may offset, such as stored colors or particles
+void CloudsVisualSystemFireworks::selfPresetLoaded(string presetPath){
+	
+}
 
 void CloudsVisualSystemFireworks::explodeFireWorkAtPoint( ofVec3f point, float t )
 {
@@ -428,37 +441,73 @@ void CloudsVisualSystemFireworks::explodeFireWorkAtPoint( ofVec3f point, float t
 	explodeFireWork( camTarget + offset );
 }
 
-void CloudsVisualSystemFireworks::explodeFireWorkAtRandomPoint()
+void CloudsVisualSystemFireworks::explodeFireWorkAtRandom()
 {
 	float t = ofGetElapsedTimef();
 	nextFireworkExplosionTime = t + ofRandom( minExplosionTime, maxExplosionTime );
 	
 	
-	ofVec3f offset( ofRandom(-1, 1), ofRandom(-.1,.1), ofRandom(-1, 1));
+	ofVec3f offset( ofRandom(-1, 1), ofRandom(-.75,.75), ofRandom(-1.5, .5));
 	offset.normalize();
-	offset *= 300;
+	offset *= 200;
 	
-	//	offset.x = abs( offset.x );
-	//	offset.y = abs( offset.y );
-	//	offset.z = abs( offset.z );
+	offset = offset * camera.getOrientationQuat();
+	
+	fireWorkExplosionTime = ofGetElapsedTimef();
+	
+
 	
 	
-	int randFWType = ofRandom(0,5);
+	int randFWType = ofRandom(0,6);
+	cout << "randFWType: "<< randFWType << endl;
 	switch (randFWType) {
 		case 0:
-			
-			explodeFireWork( camTarget + offset );
+			explodeGeometry( dodecagedronPoints, camTarget + offset );
 			break;
 			
 		case 1:
 			explodeFireWork( camTarget + offset );
 			
 			break;
+		case 2:
+			explodeGeometry( octahedronPoints, camTarget + offset );
+			break;
+			
+		case 3:
+			explodeGeometry( tetrahedronPoints, camTarget + offset );
+			break;
+			
+		case 4:
+			explodeGeometry( dodecagedronPoints, camTarget + offset );
+			break;
 			
 		default:
-			
-			explodeFireWork( camTarget + offset );
+			explodeGeometry( dodecagedronPoints, camTarget + offset );
 			break;
+	}
+}
+
+void CloudsVisualSystemFireworks::explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset )
+{
+	ofVec3f origin = offset;
+	float rad = 20 + ofRandom(-10, 10);
+	
+	ofQuaternion q;
+	q.makeRotate(33, ofRandom(-10,10), ofRandom(-10,10), ofRandom(-10,10));
+	ofVec3f p, p1;
+	
+	for(int i=0; i<vertices.size(); i+=2){
+		
+		p = (vertices[i] * rad * .5 ) * q;
+		p1 = (vertices[i+1] * rad * .5 ) * q;
+		
+		emitterCount++;
+		emitters[emitterCount].setup( 2, p + origin, p1 + origin  );
+		emitters[emitterCount].targetRot = 0;
+		
+		emitterCount++;
+		emitters[emitterCount].setup( 2, p1 + origin , p + origin );
+		emitters[emitterCount].targetRot = 0;
 	}
 }
 
@@ -467,16 +516,123 @@ void CloudsVisualSystemFireworks::selfDrawDebug(){
 	
 }
 // or you can use selfDrawBackground to do 2D drawings that don't use the 3D camera
-void CloudsVisualSystemFireworks::selfDrawBackground(){
+void CloudsVisualSystemFireworks::selfDrawBackground()
+{
+	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_NORMALIZE);
+	//    mat->begin();
 	
-	//turn the background refresh off
-	//bClearBackground = false;
+	ofPushStyle();
 	
+	ofEnableAlphaBlending();
+	ofBlendMode( OF_BLENDMODE_ADD );
+	ofEnablePointSprites();
+	
+	glowFbo0.begin();
+	ofClear(0,0,0,255);
+	
+	camera.begin();
+	
+	shader.begin();
+	shader.setUniform1f( "time", ofGetElapsedTimef() );
+	shader.setUniform1f( "nearClip", camera.getNearClip() );
+	shader.setUniform1f( "farClip", camera.getFarClip() );
+	shader.setUniform3f("cameraPosition", camPos.x, camPos.y, camPos.z );
+	shader.setUniform4f("startColor", startColor.x, startColor.y, startColor.z, startColor.w );
+	shader.setUniform4f("endColor", endColor.x, endColor.y, endColor.z, endColor.w );
+	
+	shader.setUniform3f( "gravity", particleGravity.x, particleGravity.y, particleGravity.z );
+	
+	shader.setUniformTexture("starMap", sprites["star"].getTextureReference(), 3 );
+	shader.setUniformTexture("triangleMap", sprites["triangle"].getTextureReference(), 2 );
+	shader.setUniformTexture("squareMap", sprites["square"].getTextureReference(), 1 );
+	shader.setUniformTexture("circleMap", sprites["circle"].getTextureReference(), 0 );
+	
+	vbo.drawElements( GL_POINTS, numSprites );
+	
+	sprites["cicle"].unbind();
+	sprites["square"].unbind();
+	sprites["triangle"].unbind();
+	sprites["star"].unbind();
+	
+	shader.end();
+	
+//	ofSetColor(255,0,0);
+//	for (int i=0; i<emitterCount; i++) {
+//		ofPushMatrix();
+//		ofTranslate( emitters[i].pos );
+//		
+//		ofRect(-5, -5, 10, 10);
+//		
+//		ofPopMatrix();
+//	}
+	
+	camera.end();
+	
+	glowFbo0.end();
+	
+	ofPopStyle();
+	
+	ofSetColor(255);
+	int alpha = 255;
+	
+	glowFbo1.begin();
+	ofClear(0,0,0,alpha);
+	glowFbo0.draw(0, 0, glowFbo1.getWidth(), glowFbo1.getHeight() );
+	glowFbo1.end();
+	
+	glowFbo2.begin();
+	ofClear(0,0,0, alpha);
+	glowFbo1.draw(0, 0, glowFbo2.getWidth(), glowFbo2.getHeight() );
+	glowFbo2.end();
+	
+	glowFbo3.begin();
+	ofClear(0,0,0, alpha);
+	glowFbo2.draw(0, 0, glowFbo3.getWidth(), glowFbo3.getHeight() );
+	glowFbo3.end();
+	
+	glowFbo4.begin();
+	ofClear(0,0,0, alpha);
+	glowFbo3.draw(0, 0, glowFbo4.getWidth(), glowFbo4.getHeight() );
+	glowFbo4.end();
+	
+	glowFbo5.begin();
+	ofClear(0,0,0, alpha);
+	glowFbo4.draw(0, 0, glowFbo5.getWidth(), glowFbo5.getHeight() );
+	glowFbo5.end();
+	
+	glowFbo6.begin();
+	ofClear(0,0,0, alpha);
+	glowFbo5.draw(0, 0, glowFbo6.getWidth(), glowFbo6.getHeight() );
+	glowFbo6.end();
+	
+	glowShader.begin();
+	glowShader.setUniformTexture( "fbo", glowFbo0.getTextureReference(), 0);
+	
+	glowShader.setUniformTexture( "mm1", glowFbo1.getTextureReference(), 1);
+	glowShader.setUniformTexture( "mm2", glowFbo2.getTextureReference(), 2);
+	glowShader.setUniformTexture( "mm3", glowFbo3.getTextureReference(), 4);
+	glowShader.setUniformTexture( "mm4", glowFbo4.getTextureReference(), 5);
+	glowShader.setUniformTexture( "mm5", glowFbo5.getTextureReference(), 6);
+	glowShader.setUniformTexture( "mm6", glowFbo6.getTextureReference(), 7);
+	glowFbo0.draw(0, 0, ofGetWidth(), ofGetHeight() );
+	
+	glowShader.end();
+	
+//	//turn the background refresh off
+//	//bClearBackground = false;
+//	ofClear(255,255,255,255);
+//	ofSetColor(255, 0, 0);
+//	glDisable( GL_DEPTH_TEST );
+//	getSharedRenderTarget().draw(0, 0, ofGetWidth(), ofGetHeight() );
+//	
 }
+
 // this is called when your system is no longer drawing.
 // Right after this selfUpdate() and selfDraw() won't be called any more
-void CloudsVisualSystemFireworks::selfEnd(){
-	
+void CloudsVisualSystemFireworks::selfEnd()
+{
+
 	//	simplePointcloud.clear();
 	
     delete[] positions;
@@ -498,7 +654,11 @@ void CloudsVisualSystemFireworks::selfExit(){
 //events are called when the system is active
 //Feel free to make things interactive for you, and for the user!
 void CloudsVisualSystemFireworks::selfKeyPressed(ofKeyEventArgs & args){
-	
+	if (args.key == 'l') {
+		shader.load(getVisualSystemDataPath() + "shaders/base.vert", getVisualSystemDataPath() + "shaders/base.frag");
+		
+		glowShader.load(getVisualSystemDataPath() + "shaders/post");
+	}
 }
 void CloudsVisualSystemFireworks::selfKeyReleased(ofKeyEventArgs & args){
 	

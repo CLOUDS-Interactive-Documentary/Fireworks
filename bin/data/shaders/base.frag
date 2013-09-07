@@ -13,6 +13,8 @@ varying vec3 ecPosition3;
 varying vec3 eye;
 varying vec4 color;
 varying float age;
+varying float pointSize;
+varying float attenuation;
 
 varying vec4 q;
 varying float tIndex;
@@ -56,16 +58,19 @@ void main(){
 	int textureIndex = int(floor(tIndex));
 	vec4 texCol;
 	
-	if(textureIndex == 0)		texCol = texture2D( circleMap, rotUV );
-	else if(textureIndex == 1)	texCol = texture2D( triangleMap, rotUV );
-	else if(textureIndex == 2)	texCol = texture2D( squareMap, rotUV );
-	else						texCol = texture2D( triangleMap, rotUV );
-
-
-	//discard low alphas
-	if(texCol.w < .01)	discard;
+	if(pointSize > 2.){
+		
+		if(textureIndex == 0)		texCol = texture2D( triangleMap, rotUV );
+		else if(textureIndex == 1)	texCol = texture2D( circleMap, rotUV );
+		else if(textureIndex == 2)	texCol = texture2D( squareMap, rotUV );
+		else						texCol = texture2D( triangleMap, rotUV );
+		
+		
+		//discard low alphas
+		if(texCol.w < .01)	discard;
+	}
 	
 	//color
-	gl_FragColor = color * depthVal;
+	gl_FragColor = color * depthVal * (attenuation * .5 + .5);
 	
 }

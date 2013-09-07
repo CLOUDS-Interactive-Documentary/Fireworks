@@ -12,6 +12,77 @@
 
 #include "CloudsVisualSystem.h"
 
+class FireworkEmitter;
+class FireworkEmitter{
+public:
+	FireworkEmitter(){
+		span = 1;
+		startTime = ofGetElapsedTimef();
+		endTime = startTime + span;
+		bClamp = true;
+		bCompleted = false;
+	};
+	
+	FireworkEmitter(float _span)
+	{
+		span = _span;
+		startTime = ofGetElapsedTimef();
+		endTime = startTime + span;
+		bClamp = true;
+		bCompleted = false;
+	};
+	~FireworkEmitter(){};
+	
+	void setup( float span, ofVec3f _startPos, ofVec3f _endPos )
+	{
+		startTime = ofGetElapsedTimef();
+		endTime = startTime + span;
+		bCompleted = false;
+		
+		startPos = _startPos;
+		endPos = _endPos;
+	}
+	
+	void update(float t = ofGetElapsedTimef())
+	{
+		age = ofxTween::map( t, startTime, endTime, 0, 1, bClamp, ease, ofxTween::easeOut );
+		lastPos = pos;
+		pos = startPos * (1.-age) + endPos*age;
+		
+		if(lastPos != pos){
+			vel = lastPos - pos;
+		}
+		
+		bCompleted = t >= endTime;
+	}
+	
+	void 	  operator=( const FireworkEmitter e)
+	{
+		startTime = e.startTime;
+		endTime = e.endTime;
+		age = e.age;
+		span = e.span;
+		
+		startPos = e.startPos;
+		endPos = e.endPos;
+		lastPos = e.lastPos;
+		pos = e.pos;
+		vel = e.vel;
+		origin = e.origin;
+		q = e.q;
+		bClamp = e.bClamp;
+		targetRot = e.targetRot;
+	};
+	
+	float startTime, endTime, age, span;
+	bool bClamp;
+	ofVec3f startPos, endPos, lastPos, pos, vel, origin;
+	ofQuaternion q;
+	float targetRot;
+	
+	bool bCompleted;
+	ofxEasingSine ease;
+};
 
 //TODO: rename this to your own visual system
 class CloudsVisualSystemFireworks : public CloudsVisualSystem {
@@ -92,6 +163,7 @@ public:
     void selfMousePressed(ofMouseEventArgs& data);
     void selfMouseReleased(ofMouseEventArgs& data);
 	
+	void loadFileToGeometry( string loc, vector<ofVec3f>& points );
 	
     // if you use a custom camera to fly through the scene
 	// you must implement this method for the transitions to work properly
@@ -113,11 +185,20 @@ public:
 	void trailPoint( ofVec3f point, ofVec3f vel = ofVec3f(), int count = 10 );
 	
 	//camera
-	ofEasyCam camera;
+//	ofEasyCam camera;
+	ofCamera camera;
+	ofVec3f camTargetDelta;
+	
+	vector<ofVec3f>	dodecagedronPoints;
+	vector<ofVec3f>	icosahedronPoints;
+	vector<ofVec3f>	octahedronPoints;
+	vector<ofVec3f>	tetrahedronPoints;
+	
 	ofShader shader;
 	ofVbo vbo;
 	ofVec3f camPos;
 	ofVec3f camTarget;
+	ofVec3f camAim, camVel;
 	
 	//particles
 	ofVec3f* positions;
@@ -151,10 +232,28 @@ public:
 	ofImage spriteImage;
 	
 	float nextFireworkExplosionTime;
-	void explodeFireWorkAtRandomPoint();
+	void explodeFireWorkAtRandom();
 	void explodeFireWorkAtPoint(ofVec3f point, float t=ofGetElapsedTimef() );
 	
+	void explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset );
+	void dodecahedronExplostion( ofVec3f offset );
+	
 	ofVec3f nextExplosion;
+	
+	int numSprites;
+	
+	vector< FireworkEmitter > emitters;
+	int emitterCount;
+	ofVec3f emitterCentroid;
+	
+	ofFbo glowFbo0;
+	ofFbo glowFbo1;
+	ofFbo glowFbo2;
+	ofFbo glowFbo3;
+	ofFbo glowFbo4;
+	ofFbo glowFbo5;
+	ofFbo glowFbo6;
+	ofShader glowShader;
 	
 protected:
 	
