@@ -37,9 +37,9 @@ void CloudsVisualSystemFireworks::selfSetupGui(){
 		
 	customGui->addToggle("Custom Toggle", &customToggle);
 	
-	startColorSampler =  customGui->addImageSampler("birth color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
+	customGui->addImageSampler("birth color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	
-	endColorSampler =  customGui->addImageSampler("death color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
+	customGui->addImageSampler("death color map", &colorSampleImage, (float)colorSampleImage.getWidth()/2, (float)colorSampleImage.getHeight()/2 );
 	
 	ofAddListener(customGui->newGUIEvent, this, &CloudsVisualSystemFireworks::selfGuiEvent);
 	
@@ -667,8 +667,8 @@ void CloudsVisualSystemFireworks::selfExit()
 	//???: shuld I be deleting this here? its added to the guis vector
 	//	delete customGui;
 	
-	delete startColorSampler;
-	delete endColorSampler;
+//	delete startColorSampler;
+//	delete endColorSampler;
 }
 
 //events are called when the system is active
