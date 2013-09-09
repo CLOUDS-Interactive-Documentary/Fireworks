@@ -82,8 +82,6 @@ void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e){
 // geometry should be loaded here
 void CloudsVisualSystemFireworks::selfSetup()
 {
-	fireworksRenderGui = NULL;
-	fireworksBehaviorGui = NULL;
 }
 
 void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f>& points )
@@ -106,7 +104,9 @@ void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f
 }
 
 
-void CloudsVisualSystemFireworks::selfBegin(){
+void CloudsVisualSystemFireworks::selfBegin()
+{
+	
 	//setupParticles
 	FIREWORKS_NUM_PARTICLES = 200000;
 	
@@ -595,17 +595,27 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 // Right after this selfUpdate() and selfDraw() won't be called any more
 void CloudsVisualSystemFireworks::selfEnd()
 {
-	emitters.clear();
-	rockets.clear();
-	
-	triangleImage.clear();
-	squareImage.clear();
-	circleImage.clear();
-	
 	dodecagedronPoints.clear();
 	octahedronPoints.clear();
 	tetrahedronPoints.clear();
 	icosahedronPoints.clear();
+	
+	colorSampleImage.clear();
+	triangleImage.clear();
+	squareImage.clear();
+	circleImage.clear();
+	
+	//???: whats the right way to de-allocate these?
+	glowFbo0.allocate( 0, 0 );
+	glowFbo1.allocate( 0, 0 );
+	glowFbo2.allocate( 0, 0 );
+	glowFbo3.allocate( 0, 0 );
+	glowFbo4.allocate( 0, 0 );
+	glowFbo5.allocate( 0, 0 );
+	glowFbo6.allocate( 0, 0 );
+	
+	emitters.clear();
+	rockets.clear();
 	
 	vbo.clear();
 	
