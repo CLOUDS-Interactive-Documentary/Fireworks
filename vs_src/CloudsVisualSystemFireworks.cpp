@@ -82,30 +82,7 @@ void CloudsVisualSystemFireworks::guiSystemEvent(ofxUIEventArgs &e){
 // geometry should be loaded here
 void CloudsVisualSystemFireworks::selfSetup()
 {
-}
-
-void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f>& points )
-{
-	ofBuffer buffer = ofBufferFromFile( loc );
-    points.clear();
-    if(buffer.size()) {
-		
-		while (buffer.isLastLine() == false) {
-			string line = buffer.getNextLine();
-			
-			vector<string> vals = ofSplitString( line, ",");
-			
-			points.push_back( ofVec3f( ofToFloat(vals[0]),ofToFloat(vals[1]),ofToFloat(vals[2]) ) );
-		}
-		
-    }
 	
-	buffer.clear();
-}
-
-
-void CloudsVisualSystemFireworks::selfBegin()
-{
 	
 	//setupParticles
 	FIREWORKS_NUM_PARTICLES = 200000;
@@ -188,6 +165,63 @@ void CloudsVisualSystemFireworks::selfBegin()
 	glowFbo6.allocate( glowFbo5.getWidth()/2, glowFbo5.getHeight()/2, GL_RGB );;
 	
 	glowShader.load(getVisualSystemDataPath() + "shaders/post");
+}
+
+void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f>& points )
+{
+	ofBuffer buffer = ofBufferFromFile( loc );
+    points.clear();
+    if(buffer.size()) {
+		
+		while (buffer.isLastLine() == false) {
+			string line = buffer.getNextLine();
+			
+			vector<string> vals = ofSplitString( line, ",");
+			
+			points.push_back( ofVec3f( ofToFloat(vals[0]),ofToFloat(vals[1]),ofToFloat(vals[2]) ) );
+		}
+		
+    }
+	
+	buffer.clear();
+}
+
+
+void CloudsVisualSystemFireworks::selfBegin()
+{	
+	//particle behavior
+//	fireworkGravity.set(0, -6 / 120., 0 );
+//	particleGravity.set( 0, 40, 0);
+//	minVel = 4;
+//	maxVel = 60;
+//	maxFWVel = 2.4;
+	
+	//shader
+	shader.begin();
+	shader.setUniform3f( "gravity", particleGravity.x, particleGravity.y, particleGravity.z );
+	shader.end();
+	
+//	startColor.set( .9, .95, 1.95, 1 );
+//	endColor.set( .6, 1.3, .2, 1 );
+//	
+//	minLifeSpan = .1;
+//	maxLifeSpan = 1;
+//	
+//	//camera
+//	camSpeed = 1;
+	
+	//particle rendering
+	bUpdateVbo = true;
+	indexCount = 0;
+	nextIndex = 0;
+	numSprites = 0;
+	
+	nextFireworkExplosionTime = ofGetElapsedTimef() + 1;
+	
+	ofEnableArbTex();
+	
+	camera.setPosition(0, 0, 0);
+	camTarget.set( 0,0,300);
 }
 
 
@@ -595,6 +629,11 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 // Right after this selfUpdate() and selfDraw() won't be called any more
 void CloudsVisualSystemFireworks::selfEnd()
 {
+}
+// this is called when you should clear all the memory and delet anything you made in setup
+void CloudsVisualSystemFireworks::selfExit()
+{
+	
 	dodecagedronPoints.clear();
 	octahedronPoints.clear();
 	tetrahedronPoints.clear();
@@ -626,14 +665,10 @@ void CloudsVisualSystemFireworks::selfEnd()
     delete [] indices;
 	
 	//???: shuld I be deleting this here? its added to the guis vector
-//	delete customGui;
+	//	delete customGui;
 	
 	delete startColorSampler;
 	delete endColorSampler;
-}
-// this is called when you should clear all the memory and delet anything you made in setup
-void CloudsVisualSystemFireworks::selfExit(){
-	
 }
 
 //events are called when the system is active
