@@ -12,6 +12,74 @@
 
 #include "CloudsVisualSystem.h"
 
+class FireworkRocket;
+class FireworkRocket{
+public:
+	FireworkRocket(){
+		vertices = NULL;
+		bStarted = bEnded = false;
+	}
+	~FireworkRocket(){};
+	
+	void setup( float _startTime, float _span, ofVec3f _startPos, ofVec3f _endPos, ofVbo* v )
+	{
+		startTime = _startTime;
+		startPos = _startPos;
+		span = _span;
+		endPos = _endPos;
+		endTime = startTime + span;
+		
+		bStarted = bEnded = false;
+		
+		vertices = v;
+	}
+	
+	void update( float elapsedTime = ofGetElapsedTimef() )
+	{
+		if(!bStarted && elapsedTime >= startTime)
+		{
+			bStarted = true;
+		}
+		else if(!bEnded && elapsedTime >= endTime )
+		{
+			bEnded = true;
+		}
+		
+		age = ofMap( elapsedTime, startTime, endTime, 0, 1, true );
+		
+
+	}
+	
+	void draw()
+	{
+		ofSetLineWidth( 3  );
+		float a = ofClamp( ofMap( age, 0, 1., 0, 2), 0, 1 );
+		float b = ofClamp( ofMap( age, 0, 1, -1, 1 ), 0, 1);
+		
+
+		ofLine(startPos * (1.-b) + endPos * b, endPos * a + startPos * (1.-a) );
+	}
+	
+	
+	void 	  operator=( const FireworkRocket r)
+	{
+		startTime = r.startTime;
+		endTime = r.endTime;
+		age = r.age;
+		span = r.span;
+		
+		startPos = r.startPos;
+		cv = r.cv;
+		endPos = r.endPos;
+	};
+	
+	ofVec3f startPos, endPos, cv;
+	float startTime, endTime, span, age;
+	bool bStarted, bEnded;
+	
+	ofVbo* vertices;
+};
+
 class FireworkEmitter;
 class FireworkEmitter{
 public:
@@ -20,7 +88,7 @@ public:
 		startTime = ofGetElapsedTimef();
 		endTime = startTime + span;
 		bClamp = true;
-		bCompleted = false;
+		bEnded = false;
 	};
 	
 	FireworkEmitter(float _span)
@@ -29,15 +97,16 @@ public:
 		startTime = ofGetElapsedTimef();
 		endTime = startTime + span;
 		bClamp = true;
-		bCompleted = false;
+		bEnded = false;
 	};
 	~FireworkEmitter(){};
 	
-	void setup( float span, ofVec3f _startPos, ofVec3f _endPos )
+	void setup( float _startTime, float _span, ofVec3f _startPos, ofVec3f _endPos )
 	{
-		startTime = ofGetElapsedTimef();
+		startTime = _startTime;
+		span = _span;
 		endTime = startTime + span;
-		bCompleted = false;
+		bStarted = bEnded = false;
 		
 		startPos = _startPos;
 		endPos = _endPos;
@@ -45,7 +114,7 @@ public:
 	
 	void update(float t = ofGetElapsedTimef())
 	{
-		age = ofxTween::map( t, startTime, endTime, 0, 1, bClamp, ease, ofxTween::easeOut );
+		age = ofxTween::map( t, startTime, endTime, 0, 1, true, ease, ofxTween::easeOut );
 		lastPos = pos;
 		pos = startPos * (1.-age) + endPos*age;
 		
@@ -53,7 +122,15 @@ public:
 			vel = lastPos - pos;
 		}
 		
-		bCompleted = t >= endTime;
+		if(!bStarted && t >= startTime)
+		{
+			bStarted = true;
+		}
+		
+		else if( t>= endTime)
+		{
+			bEnded = true;
+		}
 	}
 	
 	void 	  operator=( const FireworkEmitter e)
@@ -70,17 +147,14 @@ public:
 		vel = e.vel;
 		origin = e.origin;
 		q = e.q;
-		bClamp = e.bClamp;
-		targetRot = e.targetRot;
 	};
 	
 	float startTime, endTime, age, span;
 	bool bClamp;
 	ofVec3f startPos, endPos, lastPos, pos, vel, origin;
 	ofQuaternion q;
-	float targetRot;
 	
-	bool bCompleted;
+	bool bEnded, bStarted;
 	ofxEasingSine ease;
 };
 
@@ -235,7 +309,7 @@ public:
 	void explodeFireWorkAtRandom();
 	void explodeFireWorkAtPoint(ofVec3f point, float t=ofGetElapsedTimef() );
 	
-	void explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset );
+	void explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset, ofVec3f rocketStart );
 	void dodecahedronExplostion( ofVec3f offset );
 	
 	ofVec3f nextExplosion;
@@ -255,6 +329,11 @@ public:
 	ofFbo glowFbo6;
 	ofShader glowShader;
 	
+	vector<FireworkRocket> rockets;
+	int rocketCount;
+	
+	ofVbo curvePoints;
+	
 protected:
 	
 	ofxUISuperCanvas* customGui;
@@ -270,7 +349,10 @@ protected:
 	
 	int FIREWORKS_NUM_PARTICLES;
 	
-	map<string, ofImage> sprites;
+//	map<string, ofImage> sprites;
+	ofImage triangleImage;
+	ofImage squareImage;
+	ofImage circleImage;
 	
 	float minLifeSpan, maxLifeSpan;
 	ofImage colorSampleImage;

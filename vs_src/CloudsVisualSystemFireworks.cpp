@@ -84,64 +84,6 @@ void CloudsVisualSystemFireworks::selfSetup()
 {
 	fireworksRenderGui = NULL;
 	fireworksBehaviorGui = NULL;
-	
-	FIREWORKS_NUM_PARTICLES = 400000;
-	
-	positions = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
-	velocities = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
-	lifeData = new ofFloatColor[ FIREWORKS_NUM_PARTICLES ];
-	indices = new ofIndexType[ FIREWORKS_NUM_PARTICLES ];
-	
-	minVel = 0; maxVel = 200;
-	
-	float lifespan;
-	float t = ofGetElapsedTimef();
-	
-	for (int i=0; i<FIREWORKS_NUM_PARTICLES; i++) {
-		//		indices[i] = i;
-		//		lifeData[i].r = 0;
-		//		lifeData[i].g = .1;
-	}
-	
-	//	explodeFireWorkAtRandom();
-	
-	vbo.setVertexData( &positions[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
-	vbo.setNormalData( &velocities[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
-	vbo.setIndexData( &indices[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
-	
-	
-	vbo.setColorData( &lifeData[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
-	
-	//	indexCount = 0;// FIREWORKS_NUM_PARTICLES;
-	
-	colorSampleImage.loadImage( getVisualSystemDataPath() + "GUI/defaultColorPalette.png" );
-	
-	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/dodecahedron.txt", dodecagedronPoints );
-	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/octahedron.txt", octahedronPoints );
-	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/tetrahedron.txt", tetrahedronPoints );
-	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/icosahedron.txt", icosahedronPoints );
-//	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/octahedron.txt", octahedronPoints );
-//	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/tetrahedron.txt", tetrahedronPoints );
-	
-	// this is our buffer to stroe the text data
-//    ofBuffer buffer = ofBufferFromFile("animationTargets/dodecahedron.txt");
-//    dodecagedronPoints.clear();
-//    if(buffer.size()) {
-//		
-//		while (buffer.isLastLine() == false) {
-//			string line = buffer.getNextLine();
-//			
-//			vector<string> vals = ofSplitString( line, ",");
-//		
-//			dodecagedronPoints.push_back( ofVec3f( ofToFloat(vals[0]),ofToFloat(vals[1]),ofToFloat(vals[2]) ) );
-//		}
-//
-//    }
-//	
-//	for (int i=0; i<dodecagedronPoints.size(); i++) {
-//		cout << dodecagedronPoints[i] << endl;
-//	}
-	
 }
 
 void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f>& points )
@@ -165,6 +107,32 @@ void CloudsVisualSystemFireworks::loadFileToGeometry( string loc, vector<ofVec3f
 
 
 void CloudsVisualSystemFireworks::selfBegin(){
+	//setupParticles
+	FIREWORKS_NUM_PARTICLES = 200000;
+	
+	positions = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
+	velocities = new ofVec3f[ FIREWORKS_NUM_PARTICLES ];
+	lifeData = new ofFloatColor[ FIREWORKS_NUM_PARTICLES ];
+	indices = new ofIndexType[ FIREWORKS_NUM_PARTICLES ];
+	
+	minVel = 0; maxVel = 200;
+	
+	float lifespan;
+	float t = ofGetElapsedTimef();
+	
+	vbo.setVertexData( &positions[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
+	vbo.setNormalData( &velocities[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
+	vbo.setIndexData( &indices[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
+	
+	
+	vbo.setColorData( &lifeData[0], FIREWORKS_NUM_PARTICLES, GL_DYNAMIC_DRAW );
+	
+	colorSampleImage.loadImage( getVisualSystemDataPath() + "GUI/defaultColorPalette.png" );
+	
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/dodecahedron.txt", dodecagedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/octahedron.txt", octahedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() +  "animationTargets/tetrahedron.txt", tetrahedronPoints );
+	loadFileToGeometry( getVisualSystemDataPath() + "animationTargets/icosahedron.txt", icosahedronPoints );
 	
 	//particle behavior
 	fireworkGravity.set(0, -6 / 120., 0 );
@@ -200,22 +168,13 @@ void CloudsVisualSystemFireworks::selfBegin(){
 	
 	ofDisableArbTex();
 	
+	
 	//	sprites["star"].loadImage(  getVisualSystemDataPath() + "images/star.png" );
-	sprites["triangle"].loadImage(  getVisualSystemDataPath() + "images/triangle-sprite.png" );
-	sprites["square"].loadImage(  getVisualSystemDataPath() + "images/square-sprite.png" );
-	sprites["circle"].loadImage(  getVisualSystemDataPath() + "images/circle-sprite.png" );
+	triangleImage.loadImage(  getVisualSystemDataPath() + "images/triangle-sprite.png" );
+	squareImage.loadImage(  getVisualSystemDataPath() + "images/square-sprite.png" );
+	circleImage.loadImage(  getVisualSystemDataPath() + "images/circle-sprite.png" );
 	
 	ofEnableArbTex();
-	
-	//	explodeFireWorkAtRandom();
-	
-	emitters.resize( 1000 );
-	emitterCount = 0;
-	
-	for(int i=0; i<10; i++){
-		emitters[i].setup( 10, ofVec3f(), ofVec3f( ofRandom(-300, 300), ofRandom(-300, 300), ofRandom(-300, 300) ) );
-		emitterCount++;
-	}
 	
 	camera.setPosition(0, 0, 0);
 	camTarget.set( 0,0,300);
@@ -234,56 +193,49 @@ void CloudsVisualSystemFireworks::selfBegin(){
 
 void CloudsVisualSystemFireworks::selfUpdate()
 {
-	for (int i=emitterCount-1; i>=0; i--)
-	{
-		emitters[i].update();
+	float t = ofGetElapsedTimef();
+	for (int i=emitters.size()-1; i>=0; i--) {
+		emitters[i].update( t );
 		
-		emitters[i].pos += fireworkGravity * emitters[i].span * emitters[i].age * 10;
-		
-		if(emitters[i].bCompleted)
+		if( emitters[i].bStarted )
 		{
-//			emitters.erase(emitters.begin() + i);
-			emitterCount--;
-			emitters[i] = emitters[emitterCount];
-			if(emitterCount <0){
-				ofLog(OF_LOG_ERROR)	<< "emitterCount shouldn't be below 0";
-			}
-		}
-		
-		else
-		{
+			
+			emitters[i].pos += fireworkGravity * emitters[i].span * emitters[i].age * 10;
+
 			ofVec3f p0 = emitters[i].pos;
-//			p0.rotate( emitters[i].age * emitters[i].targetRot, emitters[i].origin + ofVec3f(.1), ofVec3f(0,1,0));
 			ofVec3f nScl = p0 * .01;
 			float nx = ofSignedNoise(nScl.x + emitters[i].age, nScl.y, nScl.z);
 			float ny = ofSignedNoise(nScl.x, nScl.y + emitters[i].age, nScl.z);
 			float nz = ofSignedNoise(nScl.x, nScl.y, nScl.z + emitters[i].age);
 			p0 += ofVec3f( nx, ny, nz ) * 10. * emitters[i].age;
-				
+
 			trailPoint( p0, emitters[i].vel, 4 );
+		}
+		if(emitters[i].bEnded)
+		{
+			emitters.erase( emitters.begin() + i );
 		}
 	}
 	
+//	for (int i=rockets.size()-1; i>=0; i--)
+//	{
+//		rockets[i].update( t );
+//
+//		if(rockets[i].bEnded)
+//		{
+//			rockets.erase( rockets.begin() + i );
+//		}
+//	}
+	
+	
 	//camera
-	//calc the center of the explositions so we stear to that
-	ofVec3f centroid;
-	
-	for (int i=0; i<emitterCount; i++) {
-		centroid += emitters[i].pos;
-	}
-	
-	centroid /= emitterCount;
-	
-	float centroidBlendVal = .99;
-	emitterCentroid = centroidBlendVal * emitterCentroid + centroid*(1. - centroidBlendVal);
-	
-
-	ofVec3f eul = camera.getOrientationEuler();// + ofVec3f( ofNoise( ofGetElapsedTimef() * .1), ofNoise( ofGetElapsedTimef() * .1 + .5), 0 ) * 20.;
-	float xDamp = ofMap( abs(eul.x), 70, 90, 1, 0, true );//ofClamp( max(0.f, 1.f - abs(eul.x) - 80) / 10., 0., 1.);
+	ofVec3f eul = camera.getOrientationEuler();
+	float xDamp = ofMap( abs(eul.x), 70, 90, 1, 0, true );
 	
 	float noiseTimeScl = .1;
 	float noiseOffsetScl = 800;
 	float mouseScl = .25;
+	float panScl = -5;
 	
 	float noiseValX = ofSignedNoise( ofGetElapsedTimef() * noiseTimeScl + 1. ) * noiseOffsetScl;
 	float noiseValY = ofSignedNoise( ofGetElapsedTimef() * noiseTimeScl ) * noiseOffsetScl;
@@ -293,7 +245,7 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	if(abs(eul.x) < 90) camera.tilt( tilt );
 	camera.pan( pan );
 	
-	float roll = abs(pan) * pan * -5.;
+	float roll = abs(pan) * pan * panScl;
 	camera.roll( roll );
 	
 	camera.move(0, abs(roll), 0);
@@ -307,7 +259,6 @@ void CloudsVisualSystemFireworks::selfUpdate()
 	
 	//particles
 	bool updateIndices = false;
-	float t = ofGetElapsedTimef();
 	
 	indexCount = 0;
 	for(int i=0; i<FIREWORKS_NUM_PARTICLES; i++){
@@ -334,7 +285,8 @@ void CloudsVisualSystemFireworks::selfUpdate()
 			
 			trailPoint( spawnPos[i], spawnVel[i].normalized() );
 		}
-		else{
+		else
+		{
 			spawnPos.erase( spawnPos.begin()+i );
 			spawnVel.erase( spawnVel.begin()+i );
 			spawnTime.erase( spawnTime.begin()+i );
@@ -405,9 +357,13 @@ void CloudsVisualSystemFireworks::explodeFireWork( ofVec3f origin, ofVec3f vel )
 	
 	
 	int numEmittersPerExplosion = 50;
+	float t = ofGetElapsedTimef();
 	for(int i=0; i<numEmittersPerExplosion; i++){
-		emitterCount++;
-		emitters[emitterCount].setup( ofRandom(1.5, 3.), origin, origin + ofVec3f( ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel) ) );
+		FireworkEmitter e;
+		e.setup( t, ofRandom(1.5, 3.), origin, origin + ofVec3f( ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel) ) );
+		emitters.push_back( e );
+//		emitterCount++;
+//		emitters[emitterCount].setup( t, ofRandom(1.5, 3.), origin, origin + ofVec3f( ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel), ofRandom(-maxFWVel,maxFWVel) ) );
 
 	}
 }
@@ -451,7 +407,10 @@ void CloudsVisualSystemFireworks::explodeFireWorkAtRandom()
 	offset.normalize();
 	offset *= 200;
 	
+	ofVec3f rocketStart = offset + ofVec3f( ofRandom(-400, 400), 2000, 0);
+	
 	offset = offset * camera.getOrientationQuat();
+	rocketStart = rocketStart;
 	
 	fireWorkExplosionTime = ofGetElapsedTimef();
 	
@@ -462,52 +421,64 @@ void CloudsVisualSystemFireworks::explodeFireWorkAtRandom()
 	cout << "randFWType: "<< randFWType << endl;
 	switch (randFWType) {
 		case 0:
-			explodeGeometry( dodecagedronPoints, camTarget + offset );
+			explodeGeometry( dodecagedronPoints, camTarget + offset, camTarget + rocketStart );
 			break;
 			
 		case 1:
 			explodeFireWork( camTarget + offset );
+			//explodeGeometry( tetrahedronPoints, camTarget + offset, camTarget + rocketStart );
 			
 			break;
 		case 2:
-			explodeGeometry( octahedronPoints, camTarget + offset );
+			explodeGeometry( octahedronPoints, camTarget + offset, camTarget + rocketStart );
 			break;
 			
 		case 3:
-			explodeGeometry( tetrahedronPoints, camTarget + offset );
+			explodeGeometry( tetrahedronPoints, camTarget + offset, camTarget + rocketStart );
 			break;
 			
 		case 4:
-			explodeGeometry( dodecagedronPoints, camTarget + offset );
+			explodeGeometry( dodecagedronPoints, camTarget + offset, camTarget + rocketStart );
 			break;
 			
 		default:
-			explodeGeometry( dodecagedronPoints, camTarget + offset );
+			explodeGeometry( dodecagedronPoints, camTarget + offset, camTarget + rocketStart );
 			break;
 	}
 }
 
-void CloudsVisualSystemFireworks::explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset )
+void CloudsVisualSystemFireworks::explodeGeometry( vector<ofVec3f>& vertices, ofVec3f offset, ofVec3f rocketStart )
 {
 	ofVec3f origin = offset;
-	float rad = 20 + ofRandom(-10, 10);
+	float rad = 10 + ofRandom(-5, 5);
 	
 	ofQuaternion q;
 	q.makeRotate(33, ofRandom(-10,10), ofRandom(-10,10), ofRandom(-10,10));
-	ofVec3f p, p1;
+	ofVec3f p, p1, rPos;
 	
+	float t = ofGetElapsedTimef();
+	float rSpan = 0;//.5;
 	for(int i=0; i<vertices.size(); i+=2){
 		
-		p = (vertices[i] * rad * .5 ) * q;
-		p1 = (vertices[i+1] * rad * .5 ) * q;
+		p = (vertices[i] * rad ) * q;
+		p1 = (vertices[i+1] * rad ) * q;
 		
-		emitterCount++;
-		emitters[emitterCount].setup( 2, p + origin, p1 + origin  );
-		emitters[emitterCount].targetRot = 0;
+//		rPos = rocketStart + ofVec3f(ofRandom(-500,500), ofRandom(-500,500), ofRandom(-500, 500));
+//		rPos = (rPos * camera.getOrientationQuat()) + origin;
 		
-		emitterCount++;
-		emitters[emitterCount].setup( 2, p1 + origin , p + origin );
-		emitters[emitterCount].targetRot = 0;
+//		FireworkRocket rocket;
+		FireworkEmitter e0, e1;
+		
+		e0.setup( t+rSpan, 2, p + origin, p1 + origin  );
+		
+		e1.setup( t+rSpan, 2, p1 + origin , p + origin );
+		
+//		rocket.setup( t, rSpan, origin, p+ origin, NULL );
+		
+		emitters.push_back( e0 );
+		emitters.push_back( e1 );
+		
+//		rockets.push_back( rocket );
 	}
 }
 
@@ -533,6 +504,12 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 	
 	camera.begin();
 	
+//	glDisable( GL_DEPTH_TEST );
+//	ofSetColor(225, 235, 255, 30 );
+//	for (int i=0; i<rockets.size(); i++) {
+//		rockets[i].draw();
+//	}
+	
 	shader.begin();
 	shader.setUniform1f( "time", ofGetElapsedTimef() );
 	shader.setUniform1f( "nearClip", camera.getNearClip() );
@@ -543,17 +520,11 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 	
 	shader.setUniform3f( "gravity", particleGravity.x, particleGravity.y, particleGravity.z );
 	
-	shader.setUniformTexture("starMap", sprites["star"].getTextureReference(), 3 );
-	shader.setUniformTexture("triangleMap", sprites["triangle"].getTextureReference(), 2 );
-	shader.setUniformTexture("squareMap", sprites["square"].getTextureReference(), 1 );
-	shader.setUniformTexture("circleMap", sprites["circle"].getTextureReference(), 0 );
+	shader.setUniformTexture("triangleMap", triangleImage.getTextureReference(), 2 );
+	shader.setUniformTexture("squareMap", squareImage.getTextureReference(), 1 );
+	shader.setUniformTexture("circleMap", circleImage.getTextureReference(), 0 );
 	
 	vbo.drawElements( GL_POINTS, numSprites );
-	
-	sprites["cicle"].unbind();
-	sprites["square"].unbind();
-	sprites["triangle"].unbind();
-	sprites["star"].unbind();
 	
 	shader.end();
 	
@@ -618,33 +589,37 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 	glowFbo0.draw(0, 0, ofGetWidth(), ofGetHeight() );
 	
 	glowShader.end();
-	
-//	//turn the background refresh off
-//	//bClearBackground = false;
-//	ofClear(255,255,255,255);
-//	ofSetColor(255, 0, 0);
-//	glDisable( GL_DEPTH_TEST );
-//	getSharedRenderTarget().draw(0, 0, ofGetWidth(), ofGetHeight() );
-//	
 }
 
 // this is called when your system is no longer drawing.
 // Right after this selfUpdate() and selfDraw() won't be called any more
 void CloudsVisualSystemFireworks::selfEnd()
 {
-
-	//	simplePointcloud.clear();
+	emitters.clear();
+	rockets.clear();
 	
-    delete[] positions;
-    delete[] velocities;
-    delete[] baseVelocities;
-    delete[] lifeData;
-    delete[] indices;
+	triangleImage.clear();
+	squareImage.clear();
+	circleImage.clear();
 	
-	for (std::map<string, ofImage>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
-		it->second.clear();
-	}
+	dodecagedronPoints.clear();
+	octahedronPoints.clear();
+	tetrahedronPoints.clear();
+	icosahedronPoints.clear();
 	
+	vbo.clear();
+	
+    delete [] positions;
+    delete [] velocities;
+    delete [] baseVelocities;
+    delete [] lifeData;
+    delete [] indices;
+	
+	//???: shuld I be deleting this here? its added to the guis vector
+//	delete customGui;
+	
+	delete startColorSampler;
+	delete endColorSampler;
 }
 // this is called when you should clear all the memory and delet anything you made in setup
 void CloudsVisualSystemFireworks::selfExit(){
