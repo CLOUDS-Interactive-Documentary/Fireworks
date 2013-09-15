@@ -22,7 +22,7 @@ class CloudsVisualSystemFireworks : public CloudsVisualSystem {
 	//This determines your data path so name it at first!
 	//ie getVisualSystemDataPath() uses this
     string getSystemName(){
-		return "EmptySystem";
+		return "Fireworks";
 	}
 
 	//These methods let us add custom GUI parameters and respond to their events
@@ -62,15 +62,9 @@ class CloudsVisualSystemFireworks : public CloudsVisualSystem {
 	// selfDraw draws in 3D using the default ofEasyCamera
 	// you can change the camera by returning getCameraRef()
     void selfDraw();
-	
-	// use this to draw the point cloud
-	void selfDrawRGBD();
-	
+		
     // draw any debug stuff here
 	void selfDrawDebug();
-
-	//draws through RGBD camera;
-//	void selfDrawRGBD();
 	
 	// or you can use selfDrawBackground to do 2D drawings that don't use the 3D camera
 	void selfDrawBackground();
