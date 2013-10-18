@@ -623,6 +623,8 @@ void CloudsVisualSystemFireworks::selfDrawBackground()
 	glowFbo0.draw(0, 0, ofGetWidth(), ofGetHeight() );
 	
 	glowShader.end();
+	
+	ofDisablePointSprites();
 }
 
 // this is called when your system is no longer drawing.
